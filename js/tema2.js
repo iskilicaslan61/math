@@ -9,7 +9,7 @@
 
   // ============ HAFTA 1 ============
   WEEKS.push({
-    tema: 2, no: 1, title: 'Bilinmeyen Nicelikler ve Tablo Temsili', hours: 5, code: 'MAT.6.2.1 (a, b)',
+    tema: 2, no: 5, title: 'Bilinmeyen Nicelikler ve Tablo Temsili', hours: 5, code: 'MAT.6.2.1 (a, b)',
     outcomes: ['Gerçek yaşam durumlarında nicelikleri belirler.', 'Nicelikler arasındaki ilişkileri tablo temsili kullanarak belirler.'],
     lesson: [
       { h: 'Ders Açılışı (Köprü Kurma)', html: '<p>Cebirin tarihine kısa bir yolculukla başlayın: <b>Harezmî</b> ve <b>Ömer Hayyam</b> gibi âlimler bilinmeyen bir niceliği bulmak için yöntemler geliştirdi. Bugün aynı fikri günlük hayatta kullanıyoruz.</p><div class="box idea"><b>Etkinlik – “Aklından bir sayı tut”:</b> Öğrencilerden bir sayı tutmalarını isteyin. “Sayını 2 ile çarp, 3 ekle, söyle.” Sonucu duyunca siz tutulan sayıyı bulun. Bu oyun “bilinmeyen nicelik” fikrinin kapısıdır.</div>' },
@@ -31,7 +31,7 @@
 
   // ============ HAFTA 2 ============
   WEEKS.push({
-    tema: 2, no: 2, title: 'Cebirsel İfadeler: Değişken, Katsayı, Sabit Terim', hours: 5, code: 'MAT.6.2.1 (c, ç)',
+    tema: 2, no: 6, title: 'Cebirsel İfadeler: Değişken, Katsayı, Sabit Terim', hours: 5, code: 'MAT.6.2.1 (c, ç)',
     outcomes: ['Nicelikler arasındaki ilişkileri cebirsel olarak ifade eder.', 'Cebirsel ifadenin anlamını kendi cümleleri ile açıklar.'],
     lesson: [
       { h: 'Ders Açılışı', html: '<p>Önceki haftadaki “15·t” ifadesini hatırlatın. <b>Cebirsel ifade</b> en az bir değişken (harf) içeren matematiksel ifadedir. Bu hafta onların “parçalarını” tanıyacağız.</p>' },
@@ -53,7 +53,7 @@
 
   // ============ HAFTA 3 ============
   WEEKS.push({
-    tema: 2, no: 3, title: 'Cebirsel İfadeleri Yorumlama ve Denk İfadeler', hours: 5, code: 'MAT.6.2.1 (d, e)',
+    tema: 2, no: 7, title: 'Cebirsel İfadeleri Yorumlama ve Denk İfadeler', hours: 5, code: 'MAT.6.2.1 (d, e)',
     outcomes: ['Yorumladığı cebirsel ifadelere karşılık gelen durumlara yönelik varsayımda bulunur.', 'Varsayımda bulunduğu durumları inceleyerek değişkenlerin ve cebirsel ifadelerin anlamlarına yönelik genellemeleri belirler.'],
     lesson: [
       { h: 'Aynı İfade, Farklı Hikâyeler', html: '<p>Bir cebirsel ifade birçok farklı duruma karşılık gelebilir. Örneğin <b>2x + 2y</b>:</p><ul><li>Kenarları x ve y birim olan <b>dikdörtgenin çevresi</b>,</li><li>iki farklı sayının <b>2 katlarının toplamı</b>,</li><li>x TL’lik 2 defter ile y TL’lik 2 kalemin toplam fiyatı.</li></ul>' },
@@ -75,7 +75,7 @@
 
   // ============ HAFTA 4 ============
   WEEKS.push({
-    tema: 2, no: 4, title: 'Genelleme, Sınama ve Yeniden İfade Etme', hours: 4, code: 'MAT.6.2.1 (f, g, ğ)',
+    tema: 2, no: 8, title: 'Genelleme, Sınama ve Yeniden İfade Etme', hours: 4, code: 'MAT.6.2.1 (f, g, ğ)',
     outcomes: ['Genellemelerin varsayımını karşılayıp karşılamadığını farklı sözel ve cebirsel ifadelerle sınar.', 'Doğrulayabileceği ifadeleri farklı değişken ve değerlerle yeniden ifade eder.', 'Cebirsel ifadelerin matematiğin farklı alanlarındaki ve gerçek yaşamdaki katkısını ifade eder.'],
     lesson: [
       { h: 'Genelleme Nedir?', html: '<p>Birkaç örnekte gördüğümüz ilişkinin <b>her durumda geçerli</b> olduğunu söylemeye <b>genelleme</b> denir. Cebirsel ifadeler genellemeleri kısa yazmamızı sağlar:</p><ul><li>Karenin çevresi = <b>4a</b> (a: kenar uzunluğu)</li><li>Dikdörtgenin çevresi = <b>2(a + b)</b></li><li>Çift sayılar = <b>2n</b>, ardışık iki sayı: <b>n</b> ve <b>n + 1</b></li></ul>' },
@@ -98,7 +98,7 @@
   // ============ HAFTA 5 ============
   function arithQ(r, kind) { var a1 = r.int(1, 9), d = r.int(2, 7), n = r.int(7, 15); return { a1: a1, d: d, n: n }; }
   WEEKS.push({
-    tema: 2, no: 5, title: 'Sayı Örüntüleri ve Cebirsel Kural', hours: 5, code: 'MAT.6.2.2 (a, b, c)',
+    tema: 2, no: 9, title: 'Sayı Örüntüleri ve Cebirsel Kural', hours: 5, code: 'MAT.6.2.2 (a, b, c)',
     outcomes: ['Sayı örüntülerindeki ilişkileri inceler.', 'İncelediği ilişkileri tablo, grafik ve sözel temsillerle ifade eder.', 'Örüntülerdeki yapıları cebirsel olarak ifade eder.'],
     lesson: [
       { h: 'Örüntü Avı', html: '<p>Örüntü, belli bir kurala göre devam eden sayı veya şekil dizisidir. Sınıfta <b>2, 5, 8, 11, 14, …</b> dizisini yazın. Soru: “Sonraki sayıyı nasıl buldunuz?”</p>' },
@@ -120,7 +120,7 @@
 
   // ============ HAFTA 6 ============
   WEEKS.push({
-    tema: 2, no: 6, title: 'Şekil Örüntüleri ve Çokgenlerin Açıları', hours: 5, code: 'MAT.6.2.2 + Genellemeler',
+    tema: 2, no: 10, title: 'Şekil Örüntüleri ve Çokgenlerin Açıları', hours: 5, code: 'MAT.6.2.2 + Genellemeler',
     outcomes: ['Şekil örüntülerindeki yapıyı tablo, grafik ve sözel temsillerle ifade eder.', 'Çokgenlerin iç açıları toplamı ve düzgün çokgenlerde bir iç/dış açının ölçüsünü genelleyerek cebirsel olarak ifade eder.'],
     lesson: [
       { h: 'Kibrit Çöpü Örüntüsü', html: '<p>Yan yana dizilen üçgenleri kibrit çöpleriyle yapalım:</p><table class="tbl"><thead><tr><th>Üçgen sayısı (n)</th><th>1</th><th>2</th><th>3</th><th>4</th></tr></thead><tbody><tr><td>Çöp sayısı</td><td>3</td><td>5</td><td>7</td><td>9</td></tr></tbody></table><p>Her yeni üçgen için 2 çöp eklenir → kural: <b>2n + 1</b>. 10 üçgen için 2·10 + 1 = <b>21</b> çöp gerekir.</p><div class="box ex"><b>Kareler:</b> Yan yana n kare için çöp sayısı <b>3n + 1</b> (1 kare 4, 2 kare 7, 3 kare 10 …).</div>' },
@@ -141,7 +141,7 @@
 
   // ============ HAFTA 7 ============
   WEEKS.push({
-    tema: 2, no: 7, title: 'Cebirsel İfadeler İçeren Algoritmalar', hours: 4, code: 'MAT.6.2.3 (a, b, c)',
+    tema: 2, no: 11, title: 'Cebirsel İfadeler İçeren Algoritmalar', hours: 4, code: 'MAT.6.2.3 (a, b, c)',
     outcomes: ['Cebirsel ifadeler içeren durumlardaki algoritmik yapıyı inceler.', 'Algoritmik yapıyı tablo temsiline veya cebirsel ifadelere dönüştürür.', 'Algoritmik yapının içerdiği matematiksel ilişkileri sözel olarak ifade eder.'],
     lesson: [
       { h: 'Algoritma Nedir?', html: '<p><b>Algoritma</b>, bir problemi çözmek için izlenen, adım adım ve sırası belli işlemler dizisidir. Yemek tarifi, oyun kuralları, telefon uygulamaları birer algoritmadır.</p>' },

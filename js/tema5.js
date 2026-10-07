@@ -22,7 +22,7 @@
   var KATEGORIK = ['En sevdiğin spor dalı', 'Gözlerinin rengi', 'Okula geliş şekli', 'En sevdiğin meyve', 'Doğduğun şehir', 'Favori renk', 'Sevdiğin ders'];
   var NICEL = ['Kardeş sayısı', 'Bir haftada okuduğun kitap sayısı', 'Ayakkabı numarası', 'Evdeki oda sayısı', 'Bir günde içilen su bardağı sayısı', 'Sınıfındaki öğrenci sayısı'];
   WEEKS.push({
-    tema: 5, no: 19, title: 'Araştırma Sorusu ve Veri Toplama', hours: 5, code: 'MAT.6.5.1 (a, b, c, ç)',
+    tema: 5, no: 23, title: 'Araştırma Sorusu ve Veri Toplama', hours: 5, code: 'MAT.6.5.1 (a, b, c, ç)',
     outcomes: ['Kategorik veya nicel (kesikli) veriye dayanan istatistiksel araştırma gerektiren durumları fark eder.', 'Betimleme veya karşılaştırma gerektirebilecek araştırma soruları oluşturur.', 'Veriye ulaşmak için plan yapar; anket sorularıyla veri toplar veya hazır veriye ulaşır.'],
     lesson: [
       { h: 'İstatistik Neden Gerekli?', html: '<p>“Okulumuzda en çok hangi spor sevilir?”, “Öğrenciler günde kaç saat uyuyor?” gibi soruların cevabı tahminle değil <b>veriyle</b> bulunur. İstatistiksel araştırma bu işin sistemli yoludur.</p>' },
@@ -43,7 +43,7 @@
 
   // ============ HAFTA 20 ============
   WEEKS.push({
-    tema: 5, no: 20, title: 'Veri Görselleştirme: Kök-Yaprak ve Nokta Grafiği', hours: 5, code: 'MAT.6.5.1 (d, e)',
+    tema: 5, no: 24, title: 'Veri Görselleştirme: Kök-Yaprak ve Nokta Grafiği', hours: 5, code: 'MAT.6.5.1 (d, e)',
     outcomes: ['Veri görselleştirme araçlarını (kök-yaprak gösterimi, nokta grafiği) seçme gerekçelerini belirtir.', 'Toplanan veriyi uygun araçlarla analiz eder.'],
     lesson: [
       { h: 'Nokta Grafiği', html: '<p>Az sayıda farklı değer alan nicel verilerde kullanılır. Her veri bir nokta ile gösterilir; aynı değerler üst üste dizilir.</p>' + MC.dotPlot([1, 2, 2, 3, 3, 3, 4, 4, 6], 0, 7) + '<p>Grafikte 3 değerinin üzerinde 3 nokta var → 3 değeri üç kez tekrar etmiş. <b>En yüksek nokta kümesi</b> en sık görülen değerdir.</p>' },
@@ -64,7 +64,7 @@
 
   // ============ HAFTA 21 ============
   WEEKS.push({
-    tema: 5, no: 21, title: 'Aritmetik Ortalama', hours: 5, code: 'MAT.6.5.1 (d, e, f)',
+    tema: 5, no: 25, title: 'Aritmetik Ortalama', hours: 5, code: 'MAT.6.5.1 (d, e, f)',
     outcomes: ['Veri özetleme araçlarından aritmetik ortalamayı seçme gerekçesini belirtir ve analiz eder.', 'Sonuçlara yönelik gerekçeler sunar.'],
     lesson: [
       { h: 'Adil Paylaşım Fikri', html: '<div class="box idea"><b>Etkinlik:</b> 4 arkadaşın bilyeleri: 3, 5, 7, 9. Bilyeleri toplayıp eşit paylaştırırsak herkese kaç bilye düşer? Toplam 24 → 24 ÷ 4 = <b>6</b>. İşte bu 6 sayısı <b>aritmetik ortalamadır</b>.</div>' },
@@ -85,7 +85,7 @@
 
   // ============ HAFTA 22 ============
   WEEKS.push({
-    tema: 5, no: 22, title: 'Ortanca, Tepe Değer ve Açıklık', hours: 5, code: 'MAT.6.5.1 (d, e, f, g)',
+    tema: 5, no: 26, title: 'Ortanca, Tepe Değer ve Açıklık', hours: 5, code: 'MAT.6.5.1 (d, e, f, g)',
     outcomes: ['Veri özetleme araçlarını (ortanca, tepe değer, açıklık) seçme gerekçelerini belirtir.', 'Dağılımın merkezi ve yayılımı hakkında sonuçlar çıkarır; araştırma sürecini değerlendirir.'],
     lesson: [
       { h: 'Merkez ve Yayılım', html: '<p>Verilerin <b>nerede toplandığını</b> (merkez) ve <b>ne kadar yayıldığını</b> söylemek için dört araç kullanırız: ortalama, ortanca, tepe değer, açıklık.</p>' },
@@ -107,7 +107,7 @@
 
   // ============ HAFTA 23 ============
   WEEKS.push({
-    tema: 5, no: 23, title: 'Başkalarının İstatistiksel Yorumlarını Değerlendirme', hours: 4, code: 'MAT.6.5.2 (a, b, c)',
+    tema: 5, no: 27, title: 'Başkalarının İstatistiksel Yorumlarını Değerlendirme', hours: 4, code: 'MAT.6.5.2 (a, b, c)',
     outcomes: ['Başkaları tarafından oluşturulan veriye dayalı sonuç veya yorumlara yönelik istatistiksel temellendirme yapar.', 'Hataları ve yanlılıkları tespit eder; yorumları çürütür ya da kabul eder.'],
     lesson: [
       { h: 'Eleştirel Okur Olmak', html: '<p>Haberlerde, reklamlarda, sosyal medyada grafikler ve istatistikler görüyoruz. Her söylenen doğru mu? Bu hafta <b>şüpheci ama adil</b> bir dedektif gibi olacağız.</p>' },

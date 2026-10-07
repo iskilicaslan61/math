@@ -8,7 +8,7 @@
 
   // ============ HAFTA 24 ============
   WEEKS.push({
-    tema: 6, no: 24, title: 'Deney, Çıktı ve Göreli Sıklık', hours: 5, code: 'MAT.6.6.1 (a, b)',
+    tema: 6, no: 28, title: 'Deney, Çıktı ve Göreli Sıklık', hours: 5, code: 'MAT.6.6.1 (a, b)',
     outcomes: ['Bir olayın olasılığı ile deneylerden elde ettiği veriyi ilişkilendirir.', 'Deneye ait tekrar sayısı ile deneyin çıktılarının göreli sıklıkları arasındaki ilişkiye yönelik çıkarım yapar.'],
     lesson: [
       { h: 'Olasılık Spektrumu', html: '<p>Bir olayın olabilirliğini “imkânsız – az olası – eşit – çok olası – kesin” çizgisinde gösterelim. Bu hafta bu tahminleri <b>deneyle</b> sayıya çevireceğiz.</p><div class="spectrum"><span>0 İmkânsız</span><span>0,25</span><span>0,5 Eşit</span><span>0,75</span><span>1 Kesin</span></div>' },
@@ -29,7 +29,7 @@
 
   // ============ HAFTA 25 ============
   WEEKS.push({
-    tema: 6, no: 25, title: 'Deneysel Olasılık ve Yorumlama', hours: 4, code: 'MAT.6.6.1 (c)',
+    tema: 6, no: 29, title: 'Deneysel Olasılık ve Yorumlama', hours: 4, code: 'MAT.6.6.1 (c)',
     outcomes: ['Çıkarımlardan hareketle olasılık değerini belirlemek için göreli sıklığın kullanımına yönelik yargıda bulunur.'],
     lesson: [
       { h: 'Deneysel Olasılık', html: '<div class="box def"><b>Deneysel olasılık = Olayın meydana gelme sayısı ÷ Deneyin tekrar sayısı</b></div><p>Deneysel olasılık <b>deneyden elde edilen veriye</b> dayanır. Aynı deneyi tekrarladığımızda sonuç biraz değişebilir; ama çok tekrarla kararlı hale gelir.</p>' },

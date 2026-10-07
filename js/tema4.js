@@ -10,7 +10,7 @@
   // ============ HAFTA 12 ============
   var UL = ['km', 'hm', 'dam', 'm', 'dm', 'cm', 'mm'];
   WEEKS.push({
-    tema: 4, no: 12, title: 'Uzunluk ve Alan Ölçme Birimleri Arasındaki İlişki', hours: 5, code: 'MAT.6.4.1 (a, b, c)',
+    tema: 4, no: 16, title: 'Uzunluk ve Alan Ölçme Birimleri Arasındaki İlişki', hours: 5, code: 'MAT.6.4.1 (a, b, c)',
     outcomes: ['Uzunluk ve alan ölçme birimleri arasındaki ilişkileri gözlemler ve tespit eder.', 'Uzunluk birimlerinden hareketle alan birimleri arasındaki ilişkiye dair çıkarım yapar.'],
     lesson: [
       { h: 'Ders Açılışı', html: '<p>Bir tarlanın büyüklüğü “dönüm”, evin büyüklüğü “m²” ile söylenir. Peki 1 m² kaç cm²? Uzunlukta 1 m = 100 cm biliyoruz. Alanda bu neden “100” değil de “10 000”?</p>' },
@@ -32,7 +32,7 @@
 
   // ============ HAFTA 13 ============
   WEEKS.push({
-    tema: 4, no: 13, title: 'Paralelkenarın Alanı', hours: 5, code: 'MAT.6.4.2 (a, b, c)',
+    tema: 4, no: 17, title: 'Paralelkenarın Alanı', hours: 5, code: 'MAT.6.4.2 (a, b, c)',
     outcomes: ['Dikdörtgenin alan bağıntısını gözden geçirir.', 'Dikdörtgenin alan bağıntısından yola çıkarak paralelkenarın alan bağıntısı hakkında çıkarım yapar; farklı örneklerle değerlendirir.'],
     lesson: [
       { h: 'Hatırlayalım', html: '<p>Dikdörtgenin alanı = uzun kenar × kısa kenar = <b>taban × yükseklik</b>.</p>' },
@@ -54,7 +54,7 @@
 
   // ============ HAFTA 14 ============
   WEEKS.push({
-    tema: 4, no: 14, title: 'Üçgenin Alanı', hours: 5, code: 'MAT.6.4.2 (a, b, c)',
+    tema: 4, no: 18, title: 'Üçgenin Alanı', hours: 5, code: 'MAT.6.4.2 (a, b, c)',
     outcomes: ['Paralelkenarın alan bağıntısından yola çıkarak üçgenin alan bağıntısı hakkında çıkarım yapar; farklı örneklerle değerlendirir.'],
     lesson: [
       { h: 'Keşif: Paralelkenarı Ortadan Kesmek', html: '<div class="box idea"><b>Etkinlik:</b> Bir paralelkenarı köşegeninden keserseniz iki <b>eş üçgen</b> elde edersiniz. Üçgenlerden biri paralelkenarın alanının <b>yarısı</b> kadardır.</div>' + MC.triFig(9, 7, 6, {}) },
@@ -75,7 +75,7 @@
 
   // ============ HAFTA 15 ============
   WEEKS.push({
-    tema: 4, no: 15, title: 'Alanla İlgili Gerçek Yaşam Problemleri', hours: 6, code: 'MAT.6.4.3 (a-h)',
+    tema: 4, no: 19, title: 'Alanla İlgili Gerçek Yaşam Problemleri', hours: 6, code: 'MAT.6.4.3 (a-h)',
     outcomes: ['Geometrik şekillerin alanları ile modellenen gerçek yaşam problemlerinde matematiksel bileşenleri belirler, strateji geliştirir, uygular ve genelleştirir.'],
     lesson: [
       { h: 'Problem Çözme Stratejisi', html: '<ol><li><b>Anla:</b> Hangi şekil? Hangi ölçüler? Hangi birim?</li><li><b>Birimleri eşitle</b> (m ↔ cm, m² ↔ cm²).</li><li><b>Şekli çiz</b> ve bileşenleri adlandır.</li><li><b>Formülü seç:</b> Dikdörtgen a·b, paralelkenar a·h, üçgen a·h÷2.</li><li><b>Tahmin et</b> ve sonra hesapla; <b>kontrol et</b>.</li></ol>' },
@@ -96,7 +96,7 @@
 
   // ============ HAFTA 16 ============
   WEEKS.push({
-    tema: 4, no: 16, title: 'Çemberin Uzunluğu ve π Sayısı', hours: 4, code: 'MAT.6.4.4 (a, b, c, ç, d)',
+    tema: 4, no: 20, title: 'Çemberin Uzunluğu ve π Sayısı', hours: 4, code: 'MAT.6.4.4 (a, b, c, ç, d)',
     outcomes: ['Çemberin uzunluğu ile çap uzunluğu arasındaki ilişkiye yönelik varsayımlarda bulunur, ölçümlerle listeler ve karşılaştırır.', 'Çemberin uzunluğunun çapa oranının sabit bir sayı (π) olduğuna ilişkin önerme sunar.'],
     lesson: [
       { h: 'Ölçelim ve Keşfedelim', html: '<div class="box idea"><b>Etkinlik – Çember ölçümü:</b> Farklı büyüklükte yuvarlak cisimler (şişe kapağı, bardak, tabak, tekerlek) alın. Bir ip ile çevresini, cetvelle çapını ölçün. Çevre ÷ çap hesaplayın. Tabloyu doldurun:</div><table class="tbl"><thead><tr><th>Nesne</th><th>Çap (cm)</th><th>Çevre (cm)</th><th>Çevre ÷ Çap</th></tr></thead><tbody><tr><td>Kapak</td><td>3</td><td>9,4</td><td>3,13</td></tr><tr><td>Bardak</td><td>7</td><td>22</td><td>3,14</td></tr><tr><td>Tabak</td><td>20</td><td>62,8</td><td>3,14</td></tr></tbody></table><p>Hangi çember olursa olsun <b>Çevre ÷ Çap ≈ 3,14</b> çıkıyor! Bu sabit sayıya <b>π (pi) sayısı</b> denir.</p>' },
@@ -116,7 +116,7 @@
 
   // ============ HAFTA 17 ============
   WEEKS.push({
-    tema: 4, no: 17, title: 'Çember Uzunluğu Problemleri', hours: 4, code: 'MAT.6.4.5 (a-g)',
+    tema: 4, no: 21, title: 'Çember Uzunluğu Problemleri', hours: 4, code: 'MAT.6.4.5 (a-g)',
     outcomes: ['Çap veya yarıçap uzunluğu verilen bir çemberin uzunluğuyla ilgili problemlerde bileşenleri belirler; strateji geliştirir, uygular ve genelleştirir.'],
     lesson: [
       { h: 'Problemlerde Bileşenler', html: '<p>Çember problemlerinde bileşenler: <b>çap, yarıçap, çevre (uzunluk), tur sayısı, alınan yol</b>. İlişkiler:</p><div class="box def">Ç = π · d = 2πr<br>d = Ç ÷ π &nbsp; r = Ç ÷ (2π)<br>Alınan yol = tur sayısı × Ç</div>' },
@@ -136,7 +136,7 @@
 
   // ============ HAFTA 18 ============
   WEEKS.push({
-    tema: 4, no: 18, title: 'Merkez Açı ve Gördüğü Yay Uzunluğu', hours: 4, code: 'MAT.6.4.6 (a, b, c)',
+    tema: 4, no: 22, title: 'Merkez Açı ve Gördüğü Yay Uzunluğu', hours: 4, code: 'MAT.6.4.6 (a, b, c)',
     outcomes: ['Çemberde farklı ölçülere sahip merkez açıların gördüğü yayların uzunluklarını gözlemler.', 'Merkez açı ölçüsü ile yay uzunluğu arasındaki ilişkiye dair örüntü bulur ve genelleme yapar.'],
     lesson: [
       { h: 'Merkez Açı', html: '<p>Köşesi çemberin merkezinde olan ve kolları çemberi kesen açıya <b>merkez açı</b> denir. Gördüğü çember parçasına <b>yay</b> denir.</p>' + MC.circleFig(90, {}) },

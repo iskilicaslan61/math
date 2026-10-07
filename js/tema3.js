@@ -19,7 +19,7 @@
 
   // ============ HAFTA 8 ============
   WEEKS.push({
-    tema: 3, no: 8, title: 'İki Paralel Doğru ve Bir Kesenin Oluşturduğu Açılar', hours: 5, code: 'MAT.6.3.1 (a, b, c, ç)',
+    tema: 3, no: 12, title: 'İki Paralel Doğru ve Bir Kesenin Oluşturduğu Açılar', hours: 5, code: 'MAT.6.3.1 (a, b, c, ç)',
     outcomes: ['İki paralel doğru ve bir kesen ile oluşan açıları belirler, ayrıştırır, sınıflandırır ve adlandırır.'],
     lesson: [
       { h: 'Ders Açılışı', html: '<p>Demiryolu rayları, yol çizgileri, defter çizgileri… Etrafımızda paralel doğrular çok. Bir yol bu çizgileri keserse ne olur? Öğrencilerden paralel iki çizgiyi bir cetvelle kesen bir doğru çizip açıları işaretlemelerini isteyin.</p>' },
@@ -51,7 +51,7 @@
     { t: 'karşılıklı iki çift kenarı her zaman paralel', has: ['Paralelkenar', 'Eşkenar dörtgen', 'Dikdörtgen', 'Kare'], lack: [], extraLack: ['Yamuk'] }
   ];
   WEEKS.push({
-    tema: 3, no: 9, title: 'Yamuk, Paralelkenar, Eşkenar Dörtgen, Dikdörtgen ve Kare', hours: 6, code: 'MAT.6.3.2 (a, b, c, ç, d)',
+    tema: 3, no: 13, title: 'Yamuk, Paralelkenar, Eşkenar Dörtgen, Dikdörtgen ve Kare', hours: 6, code: 'MAT.6.3.2 (a, b, c, ç, d)',
     outcomes: ['İki paralel doğrunun iki kesenle oluşturduğu şekillerin özelliklerine dair varsayımda bulunur.', 'Oluşan şekilleri özelliklerine göre listeler ve karşılaştırır.', 'İç açıları toplamı ve ortak özelliklere dair önermeler sunar; dörtgenlerin sınıflandırılmasına katkısını değerlendirir.'],
     lesson: [
       { h: 'Şekil Nasıl Oluşur?', html: '<p>İki paralel doğruyu iki farklı kesen doğru keserse <b>bir dörtgen</b> oluşur. Keselerin durumuna göre bu dörtgen yamuk, paralelkenar, eşkenar dörtgen, dikdörtgen ya da kare olabilir.</p><div class="box idea"><b>Etkinlik – GeoGebra:</b> İki paralel doğru ve iki kesen çizin. Kesenleri hareket ettirerek hangi dörtgenlerin oluştuğunu gözlemleyin. Varsayımınızı yazın, sonra ölçüm yaparak karşılaştırın.</div>' },
@@ -74,7 +74,7 @@
 
   // ============ HAFTA 10 ============
   WEEKS.push({
-    tema: 3, no: 10, title: 'Köşegenleri Birbirini Ortalayan Dörtgenler', hours: 4, code: 'MAT.6.3.3 (a, b, c, ç, d)',
+    tema: 3, no: 14, title: 'Köşegenleri Birbirini Ortalayan Dörtgenler', hours: 4, code: 'MAT.6.3.3 (a, b, c, ç, d)',
     outcomes: ['Birbirlerini ortalayan doğru parçalarını köşegen kabul eden dörtgenleri oluşturur ve listeler.', 'Özelliklerine bağlı önermeler sunar; dörtgenlerin farklı yollardan tanımlanmasına katkısını değerlendirir.'],
     lesson: [
       { h: 'Deney: İki Çubuk, Bir Dörtgen', html: '<p>İki pipet veya çubuk alın, orta noktalarından bir pime bağlayın. Çubukların uçlarını birleştirirseniz bir dörtgen elde edersiniz. Çubukların <b>uzunluklarını ve aralarındaki açıyı</b> değiştirerek farklı dörtgenler oluşturun.</p>' },
@@ -95,7 +95,7 @@
 
   // ============ HAFTA 11 ============
   WEEKS.push({
-    tema: 3, no: 11, title: 'Üçgen ve Dörtgenlerde Açı Problemleri', hours: 5, code: 'MAT.6.3.4 (a-h)',
+    tema: 3, no: 15, title: 'Üçgen ve Dörtgenlerde Açı Problemleri', hours: 5, code: 'MAT.6.3.4 (a-h)',
     outcomes: ['Açı problemlerinde matematiksel bileşenleri belirler, aralarındaki ilişkiyi bulur.', 'Strateji geliştirir, uygular, çözümü kontrol eder ve genelleştirir.'],
     lesson: [
       { h: 'Problem Çözme Adımları', html: '<ol><li><b>Anla:</b> Şekil, verilenler, istenen.</li><li><b>Plan yap:</b> Hangi bilgi işe yarar? (180°, 360°, paralellik, eşitlik)</li><li><b>Uygula:</b> İşlemleri yap.</li><li><b>Kontrol et:</b> Sonuç mantıklı mı? Toplam doğru mu?</li></ol>' },
