@@ -19,7 +19,7 @@
   // ---------------- Ana sayfa ----------------
   function viewHome() {
     var totalHours = 0; TEMAS.forEach(function (t) { totalHours += t.hours; });
-    var html = '<section class="hero"><h1>6. Sınıf Matematik</h1><p>Türkiye Yüzyılı Maarif Modeli’ne göre hafta hafta işleyeceğiniz dersin <b>konu anlatımı</b>, her konu için <b>5 test</b> ve <b>sınav kâğıdı</b>. Birimden birime (temadan temaya) ilerleyin.</p>' +
+    var html = '<section class="hero"><h1>6. Sınıf Matematik</h1><p>6. sınıf matematik müfredatına göre hafta hafta işleyeceğiniz dersin <b>konu anlatımı</b>, her konu için <b>5 test</b> ve <b>sınav kâğıdı</b>. Birimden birime (temadan temaya) ilerleyin.</p>' +
       '<div class="stats"><div class="stat"><b>' + TEMAS.length + '</b><span>Ünite (Tema)</span></div><div class="stat"><b>' + WEEKS.length + '</b><span>Haftalık konu</span></div><div class="stat"><b>' + WEEKS.length * QZ.TEST_COUNT + '</b><span>Test</span></div><div class="stat"><b>' + (WEEKS.length + TEMAS.length) + '</b><span>Sınav kâğıdı</span></div><div class="stat"><b>' + totalHours + '</b><span>Ders saati</span></div></div></section>';
     html += '<p class="note">Haftalık plan, her hafta yaklaşık 5 ders saati varsayımıyla hazırlanmıştır; kendi yıllık planınıza göre kaydırabilirsiniz. Test soruları sayısal değerleriyle her test için farklı üretilir, aynı test her açılışta aynı sorularla gelir.</p>';
     TEMAS.forEach(function (t) {
@@ -136,7 +136,7 @@
   }
 
   function viewAbout() {
-    return '<h1>Hakkında</h1><div class="card"><p>Bu uygulama, MEB Talim ve Terbiye Kurulu’nun <b>Türkiye Yüzyılı Maarif Modeli Ortaokul Matematik Dersi (6. Sınıf)</b> öğretim programındaki <b>1–6. temalar</b> için hazırlanmıştır: Sayılar ve Nicelikler (1), İşlemlerle Cebirsel Düşünme ve Değişimler, Geometrik Şekiller, Geometrik Nicelikler, İstatistiksel Araştırma Süreci, Veriden Olasılığa.</p><ul><li>Her haftalık konuda: öğrenme çıktıları, ders akışı, çözümlü örnekler ve etkinlik önerileri.</li><li>Her konu için <b>5 test</b> (20’şer soru), her konu için <b>Kahoot tarzı oyun</b> ve bir <b>10 soruluk sınav kâğıdı</b>; her ünite için ayrıca <b>20 soruluk ünite sınavı</b>.</li><li>Sınav kâğıdını “Yazdır / PDF” düğmesiyle çıktı alabilirsiniz; cevap anahtarı ayrı sayfada yer alır.</li></ul><p class="note">Haftalara bölme, dersin ders saatlerine göre öneridir. Sorular programatik olarak üretilir; sayılar her testte farklıdır ve cevaplar otomatik hesaplanır.</p></div>';
+    return '<h1>Hakkında</h1><div class="card"><p>Bu uygulama, MEB Talim ve Terbiye Kurulu’nun <b>Ortaokul Matematik Dersi (6. Sınıf)</b> öğretim programındaki <b>1–6. temalar</b> için hazırlanmıştır: Sayılar ve Nicelikler (1), İşlemlerle Cebirsel Düşünme ve Değişimler, Geometrik Şekiller, Geometrik Nicelikler, İstatistiksel Araştırma Süreci, Veriden Olasılığa.</p><ul><li>Her haftalık konuda: öğrenme çıktıları, ders akışı, çözümlü örnekler ve etkinlik önerileri.</li><li>Her konu için <b>5 test</b> (20’şer soru), her konu için <b>Kahoot tarzı oyun</b> ve bir <b>10 soruluk sınav kâğıdı</b>; her ünite için ayrıca <b>20 soruluk ünite sınavı</b>.</li><li>Sınav kâğıdını “Yazdır / PDF” düğmesiyle çıktı alabilirsiniz; cevap anahtarı ayrı sayfada yer alır.</li></ul><p class="note">Haftalara bölme, dersin ders saatlerine göre öneridir. Sorular programatik olarak üretilir; sayılar her testte farklıdır ve cevaplar otomatik hesaplanır.</p></div>';
   }
 
 

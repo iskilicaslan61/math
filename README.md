@@ -1,4 +1,4 @@
-# 6. Sınıf Matematik – Haftalık Ders Planı, Test ve Sınav (Maarif Modeli)
+# 6. Sınıf Matematik – Haftalık Ders Planı, Test ve Sınav
 
 Statik web uygulaması (derleme gerekmez). `index.html` dosyasını tarayıcıda açın veya `python3 -m http.server` ile sunun.
 
