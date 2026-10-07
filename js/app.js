@@ -32,7 +32,7 @@
       html += '<section class="tema" ' + cssVar(t.color) + '><div class="tema-h"><div><span class="pill">' + tn(t) + '. Tema • ' + t.hours + ' ders saati</span><h2>' + esc(t.title) + '</h2><p>' + esc(t.summary) + '</p></div><div><a class="btn alt sm" href="#/tema/' + t.id + '/sinav">📝 Ünite Sınavı</a></div></div><div class="weeks">';
       ws.forEach(function (w) {
         var p = weekProgress(w.no);
-        html += '<a class="wk" href="#/hafta/' + w.no + '"><div class="n">Hafta ' + wn(w) + '</div><div class="t">' + esc(w.title) + '</div><div class="m"><span>' + w.hours + ' ders saati</span><span>' + p + '/' + QZ.TEST_COUNT + ' test</span></div><div class="bar"><i style="width:' + p * 100 / QZ.TEST_COUNT + '%"></i></div></a>';
+        html += '<a class="wk" href="#/hafta/' + w.no + '"><div class="n">Hafta ' + wn(w) + '</div><div class="t">' + (load('done:' + w.no, false) ? '✅ ' : '') + esc(w.title) + '</div><div class="m"><span>' + w.hours + ' ders saati</span><span>' + p + '/' + QZ.TEST_COUNT + ' test</span></div><div class="bar"><i style="width:' + p * 100 / QZ.TEST_COUNT + '%"></i></div></a>';
       });
       html += '</div></section>';
     });
@@ -51,11 +51,34 @@
   }
   function viewLesson(w) {
     var t = temaOf(w.tema), GW = WEEKS.filter(function (x) { return gr(x) === gr(w); }), i = GW.indexOf(w);
-    var html = weekHead(w, 'ders') + '<div ' + cssVar(t.color) + '><div class="outcomes"><b>Öğrenme çıktıları:</b><ul>' + w.outcomes.map(function (o) { return '<li>' + esc(o) + '</li>'; }).join('') + '</ul></div><div class="card">';
-    w.lesson.forEach(function (s, k) { html += '<div class="sec"><h3>' + (k + 1) + '. ' + esc(s.h) + '</h3>' + s.html + '</div>'; });
-    html += '</div><p><a class="btn" href="#/hafta/' + w.no + '/testler">Testlere geç →</a> <a class="btn alt" href="#/hafta/' + w.no + '/oyun">🎮 Oyun</a> <a class="btn alt" href="#/hafta/' + w.no + '/sinav">Sınav kâğıdı</a></p>';
+    var html = weekHead(w, 'ders') + '<div ' + cssVar(t.color) + '><div class="outcomes"><b>Öğrenme çıktıları:</b><ul>' + w.outcomes.map(function (o) { return '<li>' + esc(o) + '</li>'; }).join('') + '</ul></div><div class="lesson">';
+    w.lesson.forEach(function (s, k) { html += '<div class="sec reveal"><h3><span class="snum">' + (k + 1) + '</span><span class="sico">' + secIcon(s.h) + '</span>' + esc(s.h) + '</h3>' + s.html + '</div>'; });
+    html += '</div><div class="donebox no-print"><button class="btn" id="anl">' + (load('done:' + w.no, false) ? '🎉 Tamamlandı!' : '✅ Konuyu anladım!') + '</button><span class="note">Bitirince tıkla, konfeti patlasın!</span></div><p><a class="btn" href="#/hafta/' + w.no + '/testler">Testlere geç →</a> <a class="btn alt" href="#/hafta/' + w.no + '/oyun">🎮 Oyun</a> <a class="btn alt" href="#/hafta/' + w.no + '/sinav">Sınav kâğıdı</a></p>';
     html += '<p class="note no-print">' + (i > 0 ? '<a href="#/hafta/' + GW[i - 1].no + '">← Hafta ' + wn(GW[i - 1]) + ': ' + esc(GW[i - 1].title) + '</a>' : '') + (i < GW.length - 1 ? ' &nbsp;|&nbsp; <a href="#/hafta/' + GW[i + 1].no + '">Hafta ' + wn(GW[i + 1]) + ': ' + esc(GW[i + 1].title) + ' →</a>' : '') + '</p></div>';
-    return html;
+    return { html: html, after: function () { lessonFx(w); } };
+  }
+  function secIcon(h) {
+    var m = [[/Açılış|Köprü|Hatırlatma/i, '🚀'], [/Etkinlik|Oyun|Proje/i, '🎯'], [/Örnek|Çözümlü/i, '✏️'], [/Dikkat|Hata/i, '⚠️'], [/Kural|Tanım|Nedir|Bağıntı|Formül/i, '📐'], [/Grafik|Tablo|Şekil|Görünüm/i, '📊'], [/Problem|Strateji/i, '🧩']];
+    for (var i = 0; i < m.length; i++) if (m[i][0].test(h)) return m[i][1];
+    return '📘';
+  }
+  function confetti() {
+    var cols = ['#ff4d6d', '#ffd166', '#06d6a0', '#4cc9f0', '#8e44ad', '#ff9f1c'], box = document.createElement('div'); box.className = 'confetti';
+    for (var i = 0; i < 70; i++) { var p = document.createElement('i'); p.style.left = Math.random() * 100 + '%'; p.style.background = cols[i % cols.length]; p.style.animationDelay = Math.random() * .6 + 's'; p.style.animationDuration = 1.6 + Math.random() * 1.4 + 's'; p.style.transform = 'rotate(' + Math.random() * 360 + 'deg)'; box.appendChild(p); }
+    document.body.appendChild(box); setTimeout(function () { box.remove(); }, 3500);
+  }
+  function lessonFx(w) {
+    var secs = document.querySelectorAll('.sec.reveal');
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: .08 });
+      [].forEach.call(secs, function (s) { io.observe(s); });
+    } else [].forEach.call(secs, function (s) { s.classList.add('in'); });
+    var head = document.querySelector('.wk-head');
+    if (head) { var sy = ['∑', 'π', '÷', '×', '+', '−', '√', '%', '=', '∞']; for (var i = 0; i < 8; i++) { var f = document.createElement('span'); f.className = 'fl'; f.textContent = sy[(i * 3 + w.no) % sy.length]; f.style.left = (8 + i * 12) + '%'; f.style.animationDelay = (i * .5) + 's'; f.style.fontSize = (18 + (i % 3) * 8) + 'px'; head.appendChild(f); } }
+    var prog = document.getElementById('prog'); if (!prog) { prog = document.createElement('div'); prog.id = 'prog'; document.body.appendChild(prog); }
+    window.onscroll = function () { var h = document.documentElement; var pr = h.scrollTop / ((h.scrollHeight - h.clientHeight) || 1); var p2 = document.getElementById('prog'); if (p2) p2.style.width = (pr * 100) + '%'; else window.onscroll = null; };
+    var b = document.getElementById('anl');
+    if (b) b.onclick = function () { confetti(); save('done:' + w.no, true); b.textContent = '🎉 Tamamlandı!'; };
   }
   function viewTests(w) {
     var t = temaOf(w.tema);
@@ -288,13 +311,14 @@
     else if (p[0] === 'tema' && p[2] === 'sinav' && temaOf(+p[1])) out = viewTemaExam(+p[1]);
     else if (p[0] === 'hafta' && weekOf(+p[1])) {
       var w = weekOf(+p[1]);
-      if (!p[2]) out = { html: viewLesson(w) };
+      if (!p[2]) out = viewLesson(w);
       else if (p[2] === 'testler') out = { html: viewTests(w) };
       else if (p[2] === 'test') { var k = +p[3]; out = (k >= 1 && k <= QZ.TEST_COUNT) ? viewTest(w, k) : { html: viewTests(w) }; }
       else if (p[2] === 'oyun') out = viewGame(w);
       else if (p[2] === 'sinav') out = viewExam(w);
-      else out = { html: viewLesson(w) };
+      else out = viewLesson(w);
     } else out = { html: '<h1>Sayfa bulunamadı</h1><p><a href="#/">Ana sayfaya dön</a></p>' };
+    var pg = document.getElementById('prog'); if (pg) pg.remove(); window.onscroll = null;
     app.innerHTML = out.html;
     hydrate();
     if (out.after) out.after();

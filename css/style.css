@@ -222,3 +222,47 @@ svg text.lbl { fill: var(--stroke); font-weight: 700; }
 .gtabs { display: flex; gap: 8px; margin-bottom: 14px; }
 .gt { padding: 10px 22px; border-radius: 99px; text-decoration: none; font-weight: 700; background: var(--card); border: 2px solid var(--line); color: var(--muted); }
 .gt.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+
+/* ===== Renkli ve hareketli konu anlatımı ===== */
+@keyframes up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+@keyframes pulseGlow { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand) 35%, transparent); } 50% { box-shadow: 0 0 0 8px transparent; } }
+@keyframes shake { 0%,100% { transform: none; } 20% { transform: translateX(-5px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(3px); } }
+@keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes floaty { 0% { transform: translateY(40px) rotate(0); opacity: 0; } 20% { opacity: .55; } 100% { transform: translateY(-60px) rotate(25deg); opacity: 0; } }
+@keyframes fall { to { transform: translateY(105vh) rotate(720deg); opacity: .9; } }
+@keyframes pop { 0% { transform: scale(.6); } 70% { transform: scale(1.12); } 100% { transform: scale(1); } }
+.lesson { display: grid; gap: 16px; margin-top: 14px; }
+.sec { background: var(--card); border: 1px solid var(--line); border-left: 8px solid var(--c); border-radius: 16px; padding: 4px 20px 16px; box-shadow: var(--shadow); }
+.sec.reveal { opacity: 0; transform: translateY(26px); transition: opacity .55s ease, transform .55s ease; }
+.sec.reveal.in { opacity: 1; transform: none; }
+.sec h3 { display: flex; align-items: center; gap: 10px; border-bottom: 0; color: var(--ink); margin: 14px 0 6px; font-size: 20px; }
+.snum { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 50%; color: #fff; font-size: 16px; background: linear-gradient(135deg, var(--c), color-mix(in srgb, var(--c) 55%, #ff9f1c)); box-shadow: 0 3px 8px color-mix(in srgb, var(--c) 40%, transparent); animation: pop .6s ease both; }
+.sico { font-size: 24px; display: inline-block; animation: bob 2.6s ease-in-out infinite; }
+.sec b, .sec strong { background: linear-gradient(transparent 62%, color-mix(in srgb, var(--c) 30%, transparent) 0); padding: 0 2px; border-radius: 3px; }
+.sec .box b { background: none; }
+.sec .box { position: relative; padding-top: 34px; border-width: 1.5px; transition: transform .2s, box-shadow .2s; }
+.sec .box:hover { transform: translateY(-2px) scale(1.005); box-shadow: 0 6px 18px rgba(0,0,0,.12); }
+.sec .box::before { position: absolute; top: 8px; left: 14px; font-weight: 800; font-size: 12px; letter-spacing: .08em; padding: 2px 10px; border-radius: 99px; color: #fff; }
+.box.def { background: color-mix(in srgb, #4c4fef 8%, var(--card)); border-color: #4c4fef; animation: pulseGlow 2.8s ease-in-out infinite; }
+.box.def::before { content: "📌 ÖNEMLİ NOKTA"; background: #4c4fef; }
+.box.ex { background: color-mix(in srgb, #14a44d 8%, var(--card)); border-color: #14a44d; }
+.box.ex::before { content: "✏️ ÖRNEK"; background: #14a44d; }
+.box.tip { background: color-mix(in srgb, #00a8a8 9%, var(--card)); border-color: #00a8a8; }
+.box.tip::before { content: "💡 İPUCU"; background: #00a8a8; }
+.box.warn { background: color-mix(in srgb, #d63031 8%, var(--card)); border-color: #d63031; }
+.box.warn::before { content: "⚠️ DİKKAT"; background: #d63031; }
+.box.idea { background: color-mix(in srgb, #f59f00 12%, var(--card)); border-color: #f59f00; }
+.box.idea::before { content: "🎯 ETKİNLİK"; background: #f59f00; }
+.sec.in .box.warn { animation: shake .6s .5s both; }
+.sec.in .box.idea::before { animation: bob 2s ease-in-out infinite; }
+.sec .tbl tbody tr { transition: background .15s; } .sec .tbl tbody tr:hover { background: color-mix(in srgb, var(--c) 14%, transparent); }
+.sec .tbl th { background: linear-gradient(135deg, color-mix(in srgb, var(--c) 25%, var(--card)), color-mix(in srgb, var(--c) 8%, var(--card))); }
+.outcomes { animation: up .6s ease both; }
+.wk-head { position: relative; overflow: hidden; border-radius: 0 16px 16px 0; background: linear-gradient(90deg, color-mix(in srgb, var(--c) 14%, transparent), transparent 70%); padding: 8px 14px; }
+.fl { position: absolute; bottom: 0; color: var(--c); font-weight: 800; pointer-events: none; opacity: 0; animation: floaty 5s ease-in infinite; }
+#prog { position: fixed; top: 0; left: 0; height: 4px; width: 0; z-index: 50; background: linear-gradient(90deg, #4c4fef, #00b3a4, #ffb703); transition: width .1s; }
+.donebox { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 18px 0 6px; }
+.donebox .btn { background: linear-gradient(135deg, #14a44d, #00b3a4); font-size: 18px; padding: 12px 22px; animation: pulseGlow 2.4s infinite; }
+.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 60; overflow: hidden; }
+.confetti i { position: absolute; top: -20px; width: 10px; height: 16px; border-radius: 2px; animation: fall 2.4s linear forwards; }
+@media (prefers-reduced-motion: reduce) { .sec.reveal { opacity: 1; transform: none; transition: none; } .sico, .snum, .box, .fl, .donebox .btn, .outcomes, .sec.in .box.warn { animation: none !important; } }
