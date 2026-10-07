@@ -66,7 +66,8 @@
       }
     }
     if (w.length < 3 && typeof correct === 'string') {
-      var m = /^([−-]?\d[\d.,]*)(.*)$/.exec(correct);
+      var m = /^(%?)([−-]?\d[\d.,]*)(.*)$/.exec(correct), pre = m ? m[1] : '';
+      if (m) { m = [m[0], m[2], m[3]]; }
       if (m) {
         var raw = m[1].replace('−', '-'), v;
         if (raw.indexOf(',') >= 0) v = parseFloat(raw.replace(/\./g, '').replace(',', '.'));
@@ -77,7 +78,7 @@
         cand.forEach(function (x) {
           x = Math.round(x * 100) / 100;
           if (w.length >= 3 || x < 0 || (/°/.test(suf) && x > 360)) return;
-          var s = num(x) + suf;
+          var s = pre + num(x) + suf;
           if (!seen[s]) { seen[s] = true; w.push(s); }
         });
       }

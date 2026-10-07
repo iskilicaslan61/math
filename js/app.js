@@ -9,6 +9,10 @@
   function save(k, v) { try { localStorage.setItem('m6:' + k, JSON.stringify(v)); } catch (e) { mem[k] = v; } }
   function load(k, d) { try { var s = localStorage.getItem('m6:' + k); return s === null ? (k in mem ? mem[k] : d) : JSON.parse(s); } catch (e) { return k in mem ? mem[k] : d; } }
 
+  function gr(x) { return x.grade || 6; }
+  function wn(w) { return w.wk || w.no; }
+  function tn(t) { return t.n || t.id; }
+  function homeHref(x) { return gr(x) === 7 ? '#/sinif7' : '#/'; }
   function temaOf(id) { return TEMAS.filter(function (t) { return t.id === id; })[0]; }
   function weekOf(no) { return WEEKS.filter(function (w) { return w.no === no; })[0]; }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -17,17 +21,18 @@
   function weekProgress(wn) { var done = 0; for (var t = 1; t <= QZ.TEST_COUNT; t++) { if (bestOf(wn, t) !== null) done++; } return done; }
 
   // ---------------- Ana sayfa ----------------
-  function viewHome() {
-    var totalHours = 0; TEMAS.forEach(function (t) { totalHours += t.hours; });
-    var html = '<section class="hero"><h1>6. Sınıf Matematik</h1><p>6. sınıf matematik müfredatına göre hafta hafta işleyeceğiniz dersin <b>konu anlatımı</b>, her konu için <b>5 test</b> ve <b>sınav kâğıdı</b>. Birimden birime (temadan temaya) ilerleyin.</p>' +
-      '<div class="stats"><div class="stat"><b>' + TEMAS.length + '</b><span>Ünite (Tema)</span></div><div class="stat"><b>' + WEEKS.length + '</b><span>Haftalık konu</span></div><div class="stat"><b>' + WEEKS.length * QZ.TEST_COUNT + '</b><span>Test</span></div><div class="stat"><b>' + (WEEKS.length + TEMAS.length) + '</b><span>Sınav kâğıdı</span></div><div class="stat"><b>' + totalHours + '</b><span>Ders saati</span></div></div></section>';
+  function viewHome(g) {
+    var TM = TEMAS.filter(function (t) { return gr(t) === g; }), WK = WEEKS.filter(function (w) { return gr(w) === g; });
+    var totalHours = 0; TM.forEach(function (t) { totalHours += t.hours; });
+    var html = '<div class="gtabs"><a class="gt' + (g === 6 ? ' on' : '') + '" href="#/">6. Sınıf</a><a class="gt' + (g === 7 ? ' on' : '') + '" href="#/sinif7">7. Sınıf</a></div><section class="hero"><h1>' + g + '. Sınıf Matematik</h1><p>' + g + '. sınıf matematik müfredatına göre hafta hafta işleyeceğiniz dersin <b>konu anlatımı</b>, her konu için <b>5 test</b> ve <b>sınav kâğıdı</b>. Birimden birime (temadan temaya) ilerleyin.</p>' +
+      '<div class="stats"><div class="stat"><b>' + TM.length + '</b><span>Ünite (Tema)</span></div><div class="stat"><b>' + WK.length + '</b><span>Haftalık konu</span></div><div class="stat"><b>' + WK.length * QZ.TEST_COUNT + '</b><span>Test</span></div><div class="stat"><b>' + (WK.length + TM.length) + '</b><span>Sınav kâğıdı</span></div><div class="stat"><b>' + totalHours + '</b><span>Ders saati</span></div></div></section>';
     html += '<p class="note">Haftalık plan, her hafta yaklaşık 5 ders saati varsayımıyla hazırlanmıştır; kendi yıllık planınıza göre kaydırabilirsiniz. Test soruları sayısal değerleriyle her test için farklı üretilir, aynı test her açılışta aynı sorularla gelir.</p>';
-    TEMAS.forEach(function (t) {
+    TM.forEach(function (t) {
       var ws = WEEKS.filter(function (w) { return w.tema === t.id; });
-      html += '<section class="tema" ' + cssVar(t.color) + '><div class="tema-h"><div><span class="pill">' + t.id + '. Tema • ' + t.hours + ' ders saati</span><h2>' + esc(t.title) + '</h2><p>' + esc(t.summary) + '</p></div><div><a class="btn alt sm" href="#/tema/' + t.id + '/sinav">📝 Ünite Sınavı</a></div></div><div class="weeks">';
+      html += '<section class="tema" ' + cssVar(t.color) + '><div class="tema-h"><div><span class="pill">' + tn(t) + '. Tema • ' + t.hours + ' ders saati</span><h2>' + esc(t.title) + '</h2><p>' + esc(t.summary) + '</p></div><div><a class="btn alt sm" href="#/tema/' + t.id + '/sinav">📝 Ünite Sınavı</a></div></div><div class="weeks">';
       ws.forEach(function (w) {
         var p = weekProgress(w.no);
-        html += '<a class="wk" href="#/hafta/' + w.no + '"><div class="n">Hafta ' + w.no + '</div><div class="t">' + esc(w.title) + '</div><div class="m"><span>' + w.hours + ' ders saati</span><span>' + p + '/' + QZ.TEST_COUNT + ' test</span></div><div class="bar"><i style="width:' + p * 100 / QZ.TEST_COUNT + '%"></i></div></a>';
+        html += '<a class="wk" href="#/hafta/' + w.no + '"><div class="n">Hafta ' + wn(w) + '</div><div class="t">' + esc(w.title) + '</div><div class="m"><span>' + w.hours + ' ders saati</span><span>' + p + '/' + QZ.TEST_COUNT + ' test</span></div><div class="bar"><i style="width:' + p * 100 / QZ.TEST_COUNT + '%"></i></div></a>';
       });
       html += '</div></section>';
     });
@@ -37,19 +42,19 @@
   // ---------------- Hafta sayfası ----------------
   function crumbs(w, extra) {
     var t = temaOf(w.tema);
-    return '<div class="crumbs"><a href="#/">Yıllık Plan</a> › ' + t.id + '. Tema: ' + esc(t.title) + ' › <a href="#/hafta/' + w.no + '">Hafta ' + w.no + '</a>' + (extra ? ' › ' + extra : '') + '</div>';
+    return '<div class="crumbs"><a href="' + homeHref(w) + '">Yıllık Plan</a> › ' + tn(t) + '. Tema: ' + esc(t.title) + ' › <a href="#/hafta/' + w.no + '">Hafta ' + wn(w) + '</a>' + (extra ? ' › ' + extra : '') + '</div>';
   }
   function weekHead(w, tab) {
     var t = temaOf(w.tema);
-    return crumbs(w) + '<div class="wk-head" ' + cssVar(t.color) + '><span class="pill">' + t.id + '. Tema • Hafta ' + w.no + ' • ' + w.hours + ' ders saati</span><h1>' + esc(w.title) + '</h1></div>' +
+    return crumbs(w) + '<div class="wk-head" ' + cssVar(t.color) + '><span class="pill">' + tn(t) + '. Tema • Hafta ' + wn(w) + ' • ' + w.hours + ' ders saati</span><h1>' + esc(w.title) + '</h1></div>' +
       '<div class="tabs" ' + cssVar(t.color) + '><a class="tab' + (tab === 'ders' ? ' on' : '') + '" href="#/hafta/' + w.no + '">📖 Konu Anlatımı</a><a class="tab' + (tab === 'test' ? ' on' : '') + '" href="#/hafta/' + w.no + '/testler">✅ 5 Test</a><a class="tab' + (tab === 'oyun' ? ' on' : '') + '" href="#/hafta/' + w.no + '/oyun">🎮 Oyun</a><a class="tab' + (tab === 'sinav' ? ' on' : '') + '" href="#/hafta/' + w.no + '/sinav">📝 Sınav Kâğıdı</a></div>';
   }
   function viewLesson(w) {
-    var t = temaOf(w.tema), i = WEEKS.indexOf(w);
+    var t = temaOf(w.tema), GW = WEEKS.filter(function (x) { return gr(x) === gr(w); }), i = GW.indexOf(w);
     var html = weekHead(w, 'ders') + '<div ' + cssVar(t.color) + '><div class="outcomes"><b>Öğrenme çıktıları:</b><ul>' + w.outcomes.map(function (o) { return '<li>' + esc(o) + '</li>'; }).join('') + '</ul></div><div class="card">';
     w.lesson.forEach(function (s, k) { html += '<div class="sec"><h3>' + (k + 1) + '. ' + esc(s.h) + '</h3>' + s.html + '</div>'; });
     html += '</div><p><a class="btn" href="#/hafta/' + w.no + '/testler">Testlere geç →</a> <a class="btn alt" href="#/hafta/' + w.no + '/oyun">🎮 Oyun</a> <a class="btn alt" href="#/hafta/' + w.no + '/sinav">Sınav kâğıdı</a></p>';
-    html += '<p class="note no-print">' + (i > 0 ? '<a href="#/hafta/' + WEEKS[i - 1].no + '">← Hafta ' + WEEKS[i - 1].no + ': ' + esc(WEEKS[i - 1].title) + '</a>' : '') + (i < WEEKS.length - 1 ? ' &nbsp;|&nbsp; <a href="#/hafta/' + WEEKS[i + 1].no + '">Hafta ' + WEEKS[i + 1].no + ': ' + esc(WEEKS[i + 1].title) + ' →</a>' : '') + '</p></div>';
+    html += '<p class="note no-print">' + (i > 0 ? '<a href="#/hafta/' + GW[i - 1].no + '">← Hafta ' + wn(GW[i - 1]) + ': ' + esc(GW[i - 1].title) + '</a>' : '') + (i < GW.length - 1 ? ' &nbsp;|&nbsp; <a href="#/hafta/' + GW[i + 1].no + '">Hafta ' + wn(GW[i + 1]) + ': ' + esc(GW[i + 1].title) + ' →</a>' : '') + '</p></div>';
     return html;
   }
   function viewTests(w) {
@@ -70,7 +75,7 @@
   }
   function viewTest(w, k) {
     var t = temaOf(w.tema), qs = QZ.buildTest(w, k);
-    var html = crumbs(w, 'Test ' + k) + '<div class="wk-head" ' + cssVar(t.color) + '><span class="pill">Hafta ' + w.no + ' • Test ' + k + '/' + QZ.TEST_COUNT + '</span><h1>' + esc(w.title) + '</h1></div><div class="card" ' + cssVar(t.color) + ' id="quiz">';
+    var html = crumbs(w, 'Test ' + k) + '<div class="wk-head" ' + cssVar(t.color) + '><span class="pill">Hafta ' + wn(w) + ' • Test ' + k + '/' + QZ.TEST_COUNT + '</span><h1>' + esc(w.title) + '</h1></div><div class="card" ' + cssVar(t.color) + ' id="quiz">';
     qs.forEach(function (q, i) { html += qHtml(q, i); });
     html += '</div><div class="scorebar"><div id="sc" class="score">Cevapla: 0/' + qs.length + '</div><div><button class="btn" id="finish">Bitir ve Kontrol Et</button> <button class="btn alt hidden" id="retry">Tekrar dene</button> ' + (k < QZ.TEST_COUNT ? '<a class="btn alt hidden" id="nxt" href="#/hafta/' + w.no + '/test/' + (k + 1) + '">Sonraki test →</a>' : '<a class="btn alt hidden" id="nxt" href="#/hafta/' + w.no + '/sinav">Sınav kâğıdına geç →</a>') + '</div></div>';
     return { html: html, after: function () { wireQuiz(w, k, qs); } };
@@ -153,16 +158,16 @@
   }
   function viewExam(w) {
     var t = temaOf(w.tema), qs = QZ.buildExam(w);
-    return { html: weekHead(w, 'sinav') + paperHtml('6. Sınıf Matematik – ' + w.title, 'Hafta ' + w.no + ' • ' + QZ.EXAM_SIZE + ' soru • Süre: 40 dakika', qs, t.color), after: function () { wirePaper(qs, 'w' + w.no); } };
+    return { html: weekHead(w, 'sinav') + paperHtml(gr(w) + '. Sınıf Matematik – ' + w.title, 'Hafta ' + wn(w) + ' • ' + QZ.EXAM_SIZE + ' soru • Süre: 40 dakika', qs, t.color), after: function () { wirePaper(qs, 'w' + w.no); } };
   }
   function viewTemaExam(id) {
     var t = temaOf(id), qs = QZ.buildTemaExam(id);
-    var html = '<div class="crumbs"><a href="#/">Yıllık Plan</a> › ' + t.id + '. Tema Sınavı</div><div class="wk-head" ' + cssVar(t.color) + '><span class="pill">' + t.id + '. Tema • Ünite Sınavı</span><h1>' + esc(t.title) + '</h1></div>';
-    return { html: html + paperHtml('6. Sınıf Matematik – ' + t.id + '. Tema: ' + t.title, 'Ünite sınavı • ' + qs.length + ' soru • Süre: 40 dakika', qs, t.color), after: function () { wirePaper(qs, 't' + id); } };
+    var html = '<div class="crumbs"><a href="' + homeHref(t) + '">Yıllık Plan</a> › ' + tn(t) + '. Tema Sınavı</div><div class="wk-head" ' + cssVar(t.color) + '><span class="pill">' + tn(t) + '. Tema • Ünite Sınavı</span><h1>' + esc(t.title) + '</h1></div>';
+    return { html: html + paperHtml(gr(t) + '. Sınıf Matematik – ' + tn(t) + '. Tema: ' + t.title, 'Ünite sınavı • ' + qs.length + ' soru • Süre: 40 dakika', qs, t.color), after: function () { wirePaper(qs, 't' + id); } };
   }
 
   function viewAbout() {
-    return '<h1>Hakkında</h1><div class="card"><p>Bu uygulama, MEB Talim ve Terbiye Kurulu’nun <b>Ortaokul Matematik Dersi (6. Sınıf)</b> öğretim programındaki <b>1–6. temalar</b> için hazırlanmıştır: Sayılar ve Nicelikler (1), İşlemlerle Cebirsel Düşünme ve Değişimler, Geometrik Şekiller, Geometrik Nicelikler, İstatistiksel Araştırma Süreci, Veriden Olasılığa.</p><ul><li>Her haftalık konuda: öğrenme çıktıları, ders akışı, çözümlü örnekler ve etkinlik önerileri.</li><li>Her konu için <b>5 test</b> (20’şer soru), her konu için <b>Kahoot tarzı oyun</b> ve bir <b>10 soruluk sınav kâğıdı</b>; her ünite için ayrıca <b>20 soruluk ünite sınavı</b>.</li><li>Sınav kâğıdını “Yazdır / PDF” düğmesiyle çıktı alabilirsiniz; cevap anahtarı ayrı sayfada yer alır.</li></ul><p class="note">Haftalara bölme, dersin ders saatlerine göre öneridir. Sorular programatik olarak üretilir; sayılar her testte farklıdır ve cevaplar otomatik hesaplanır.</p></div>';
+    return '<h1>Hakkında</h1><div class="card"><p>Bu uygulama, MEB Talim ve Terbiye Kurulu’nun <b>Ortaokul Matematik Dersi (6. ve 7. Sınıf)</b> öğretim programındaki <b>6. sınıf 1–6. temalar ve 7. sınıf 6 ünite</b> için hazırlanmıştır. 6. sınıf: Sayılar ve Nicelikler (1), İşlemlerle Cebirsel Düşünme ve Değişimler, Geometrik Şekiller, Geometrik Nicelikler, İstatistiksel Araştırma Süreci, Veriden Olasılığa.</p><ul><li>Her haftalık konuda: öğrenme çıktıları, ders akışı, çözümlü örnekler ve etkinlik önerileri.</li><li>Her konu için <b>5 test</b> (20’şer soru), her konu için <b>Kahoot tarzı oyun</b> ve bir <b>10 soruluk sınav kâğıdı</b>; her ünite için ayrıca <b>20 soruluk ünite sınavı</b>.</li><li>Sınav kâğıdını “Yazdır / PDF” düğmesiyle çıktı alabilirsiniz; cevap anahtarı ayrı sayfada yer alır.</li></ul><p class="note">Haftalara bölme, dersin ders saatlerine göre öneridir. Sorular programatik olarak üretilir; sayılar her testte farklıdır ve cevaplar otomatik hesaplanır.</p></div>';
   }
 
 
@@ -277,7 +282,8 @@
   // ---------------- Yönlendirme ----------------
   function route() {
     var h = location.hash.replace(/^#\/?/, ''), p = h.split('/'), out;
-    if (p[0] === '' ) out = { html: viewHome() };
+    if (p[0] === '') out = { html: viewHome(6) };
+    else if (p[0] === 'sinif7') out = { html: viewHome(7) };
     else if (p[0] === 'hakkinda') out = { html: viewAbout() };
     else if (p[0] === 'tema' && p[2] === 'sinav' && temaOf(+p[1])) out = viewTemaExam(+p[1]);
     else if (p[0] === 'hafta' && weekOf(+p[1])) {
@@ -292,7 +298,7 @@
     app.innerHTML = out.html;
     hydrate();
     if (out.after) out.after();
-    document.title = '6. Sınıf Matematik' + (p[0] === 'hafta' && weekOf(+p[1]) ? ' – ' + weekOf(+p[1]).title : '');
+    document.title = 'Matematik' + (p[0] === 'hafta' && weekOf(+p[1]) ? ' ' + gr(weekOf(+p[1])) + '. Sınıf – ' + weekOf(+p[1]).title : p[0] === 'sinif7' ? ' 7. Sınıf' : ' 6. Sınıf');
   }
   window.addEventListener('hashchange', function () { route(); window.scrollTo(0, 0); });
   route();
