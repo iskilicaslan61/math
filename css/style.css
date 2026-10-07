@@ -207,3 +207,14 @@ svg text.lbl { fill: var(--stroke); font-weight: 700; }
 .g-pl span:first-child { font-size: 28px; }
 .game .btn.alt { color: #fff; border-color: #fff; }
 @media (max-width: 600px) { .g-tiles { grid-template-columns: 1fr; } .g-q { font-size: 17px; } }
+
+/* Online sınav */
+.po { display: flex; gap: 6px; align-items: flex-start; cursor: pointer; padding: 3px 6px; border-radius: 6px; border: 1.5px solid transparent; }
+.po input { margin-top: 5px; }
+.po:hover { background: #f0f0ff; }
+.po.right { background: #d9f5d9; border-color: #14a44d; }
+.po.wrong { background: #ffd9d9; border-color: #d63031; }
+#stname { border: 0; border-bottom: 1px dotted #000; background: transparent; font: inherit; width: 60%; color: #000; }
+.result { display: flex; gap: 18px; align-items: center; max-width: 820px; margin: 0 auto 14px; background: var(--card); border: 2px solid var(--brand); border-radius: 14px; padding: 12px 18px; }
+.rs-big { font-size: 44px; font-weight: 800; color: var(--brand); line-height: 1; } .rs-big small { font-size: 16px; color: var(--muted); }
+@media print { .po input, #stname::placeholder { display: none; } .po { padding: 0; } #stname { border-bottom: 1px solid #000; } .result { display: none !important; } }

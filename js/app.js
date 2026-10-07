@@ -108,31 +108,57 @@
 
   // ---------------- Sınav kâğıdı ----------------
   function paperHtml(title, subtitle, qs, color) {
+    var cnt = qs.length;
     var per = Math.round(100 / qs.length * 10) / 10;
-    var h = '<div class="tools no-print" ' + cssVar(color) + '><button class="btn" id="pr">🖨️ Yazdır / PDF</button><button class="btn alt" id="tk">Cevap anahtarını göster</button><span class="note">Her soru ' + MC.num(per) + ' puandır. Yazdırırken “Arka plan grafikleri” seçeneği gerekmez.</span></div>';
-    h += '<article class="paper"><div class="ph"><h2>' + esc(title) + '</h2><small>' + esc(subtitle) + '</small></div><div class="pinfo"><div>Adı Soyadı:</div><div>Sınıfı / No:</div><div>Tarih:</div></div>';
+    var h = '<div class="tools no-print" ' + cssVar(color) + '><button class="btn" id="sub">✅ Teslim Et</button><button class="btn alt" id="rs">↺ Sıfırla</button><button class="btn alt" id="pr">🖨️ Yazdır / PDF</button><button class="btn alt" id="tk">Cevap anahtarını göster</button><span class="note" id="tm">⏱ 00:00</span><span class="note">Online çözmek için şıkları işaretleyip “Teslim Et”e basın. Her soru ' + MC.num(per) + ' puandır.</span></div><div id="result" class="result hidden no-print"></div>';
+    h += '<article class="paper"><div class="ph"><h2>' + esc(title) + '</h2><small>' + esc(subtitle) + '</small></div><div class="pinfo"><div>Adı Soyadı: <input id="stname" class="no-print-in" maxlength="40" placeholder="adını yaz"></div><div>Sınıfı / No:</div><div>Tarih:</div></div>';
     qs.forEach(function (q, i) {
-      h += '<div class="pq"><div class="pn">' + (i + 1) + '.</div><div><div>' + q.q + ' <span class="pp">(' + MC.num(per) + ' p)</span></div>' + (q.fig || '') + '<div class="popts">';
-      q.opts.forEach(function (o, j) { h += '<span><b>' + LET[j] + ')</b>' + o + '</span>'; });
+      h += '<div class="pq" data-i="' + i + '"><div class="pn">' + (i + 1) + '.</div><div><div>' + q.q + ' <span class="pp">(' + MC.num(per) + ' p)</span></div>' + (q.fig || '') + '<div class="popts">';
+      q.opts.forEach(function (o, j) { h += '<label class="po"><input type="radio" name="p' + i + '" value="' + j + '"><b>' + LET[j] + ')</b>' + o + '</label>'; });
       h += '</div></div></div>';
     });
     h += '<div class="key hidden" id="key"><h3 style="margin:0">Cevap Anahtarı</h3><div class="keygrid">' + qs.map(function (q, i) { return '<span>' + (i + 1) + '-' + LET[q.ans] + '</span>'; }).join('') + '</div>';
     qs.forEach(function (q, i) { h += '<div class="keyexp"><b>' + (i + 1) + '.</b> ' + LET[q.ans] + ') ' + (q.exp || '') + '</div>'; });
     return h + '</div></article>';
   }
-  function wirePaper() {
+  function wirePaper(qs, id) {
     var pr = document.getElementById('pr'), tk = document.getElementById('tk'), key = document.getElementById('key');
+    var t0 = Date.now(), done = false, tick;
+    function fmt(s) { return (s < 600 ? '0' : '') + Math.floor(s / 60) + ':' + (s % 60 < 10 ? '0' : '') + (s % 60); }
+    tick = setInterval(function () { var el = document.getElementById('tm'); if (!el) { clearInterval(tick); return; } if (!done) el.textContent = '⏱ ' + fmt(Math.floor((Date.now() - t0) / 1000)); }, 1000);
     pr.onclick = function () { window.print(); };
     tk.onclick = function () { var hid = key.classList.toggle('hidden'); tk.textContent = hid ? 'Cevap anahtarını göster' : 'Cevap anahtarını gizle'; };
+    document.getElementById('rs').onclick = function () { clearInterval(tick); route(); window.scrollTo(0, 0); };
+    document.getElementById('sub').onclick = function () {
+      if (done) return;
+      var blank = qs.filter(function (q, i) { return !document.querySelector('input[name="p' + i + '"]:checked'); }).length;
+      if (blank && !confirm(blank + ' soruyu boş bıraktın. Yine de teslim edilsin mi?')) return;
+      done = true; clearInterval(tick);
+      var ok = 0, bad = 0;
+      qs.forEach(function (q, i) {
+        var box = document.querySelector('.pq[data-i="' + i + '"]'), labs = box.querySelectorAll('label.po'), ch = box.querySelector('input:checked');
+        [].forEach.call(box.querySelectorAll('input'), function (x) { x.disabled = true; });
+        labs[q.ans].classList.add('right');
+        if (ch) { if (+ch.value === q.ans) ok++; else { bad++; labs[+ch.value].classList.add('wrong'); } }
+      });
+      var n = qs.length, score = Math.round(ok * 100 / n * 10) / 10, name = (document.getElementById('stname').value || '').trim() || 'Öğrenci';
+      var res = document.getElementById('result');
+      res.innerHTML = '<div class="rs-big">' + MC.num(score) + ' <small>/ 100</small></div><div><b>' + esc(name) + '</b><br>✅ ' + ok + ' doğru • ❌ ' + bad + ' yanlış • ⚪ ' + (n - ok - bad) + ' boş • ⏱ ' + fmt(Math.floor((Date.now() - t0) / 1000)) + '<br>' + (score >= 85 ? '🌟 Pekiyi!' : score >= 70 ? '👏 İyi' : score >= 50 ? '💪 Orta, tekrar çalış' : '📖 Konuyu tekrar et') + '</div>';
+      res.classList.remove('hidden'); key.classList.remove('hidden'); tk.textContent = 'Cevap anahtarını gizle';
+      var prev = load('exam:' + id, null); if (prev === null || score > prev) save('exam:' + id, score);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    var best = load('exam:' + id, null);
+    if (best !== null) document.getElementById('tm').textContent += '  •  En iyi: ' + MC.num(best);
   }
   function viewExam(w) {
     var t = temaOf(w.tema), qs = QZ.buildExam(w);
-    return { html: weekHead(w, 'sinav') + paperHtml('6. Sınıf Matematik – ' + w.title, 'Hafta ' + w.no + ' • ' + QZ.EXAM_SIZE + ' soru • Süre: 40 dakika', qs, t.color), after: wirePaper };
+    return { html: weekHead(w, 'sinav') + paperHtml('6. Sınıf Matematik – ' + w.title, 'Hafta ' + w.no + ' • ' + QZ.EXAM_SIZE + ' soru • Süre: 40 dakika', qs, t.color), after: function () { wirePaper(qs, 'w' + w.no); } };
   }
   function viewTemaExam(id) {
     var t = temaOf(id), qs = QZ.buildTemaExam(id);
     var html = '<div class="crumbs"><a href="#/">Yıllık Plan</a> › ' + t.id + '. Tema Sınavı</div><div class="wk-head" ' + cssVar(t.color) + '><span class="pill">' + t.id + '. Tema • Ünite Sınavı</span><h1>' + esc(t.title) + '</h1></div>';
-    return { html: html + paperHtml('6. Sınıf Matematik – ' + t.id + '. Tema: ' + t.title, 'Ünite sınavı • ' + qs.length + ' soru • Süre: 40 dakika', qs, t.color), after: wirePaper };
+    return { html: html + paperHtml('6. Sınıf Matematik – ' + t.id + '. Tema: ' + t.title, 'Ünite sınavı • ' + qs.length + ' soru • Süre: 40 dakika', qs, t.color), after: function () { wirePaper(qs, 't' + id); } };
   }
 
   function viewAbout() {
