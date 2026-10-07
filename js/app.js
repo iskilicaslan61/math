@@ -27,7 +27,7 @@
       html += '<section class="tema" ' + cssVar(t.color) + '><div class="tema-h"><div><span class="pill">' + t.id + '. Tema • ' + t.hours + ' ders saati</span><h2>' + esc(t.title) + '</h2><p>' + esc(t.summary) + '</p></div><div><a class="btn alt sm" href="#/tema/' + t.id + '/sinav">📝 Ünite Sınavı</a></div></div><div class="weeks">';
       ws.forEach(function (w) {
         var p = weekProgress(w.no);
-        html += '<a class="wk" href="#/hafta/' + w.no + '"><div class="n">Hafta ' + w.no + '</div><div class="t">' + esc(w.title) + '</div><div class="m"><span>' + w.hours + ' ders saati • ' + w.code + '</span><span>' + p + '/' + QZ.TEST_COUNT + ' test</span></div><div class="bar"><i style="width:' + p * 100 / QZ.TEST_COUNT + '%"></i></div></a>';
+        html += '<a class="wk" href="#/hafta/' + w.no + '"><div class="n">Hafta ' + w.no + '</div><div class="t">' + esc(w.title) + '</div><div class="m"><span>' + w.hours + ' ders saati</span><span>' + p + '/' + QZ.TEST_COUNT + ' test</span></div><div class="bar"><i style="width:' + p * 100 / QZ.TEST_COUNT + '%"></i></div></a>';
       });
       html += '</div></section>';
     });
@@ -42,13 +42,13 @@
   function weekHead(w, tab) {
     var t = temaOf(w.tema);
     return crumbs(w) + '<div class="wk-head" ' + cssVar(t.color) + '><span class="pill">' + t.id + '. Tema • Hafta ' + w.no + ' • ' + w.hours + ' ders saati</span><h1>' + esc(w.title) + '</h1></div>' +
-      '<div class="tabs" ' + cssVar(t.color) + '><a class="tab' + (tab === 'ders' ? ' on' : '') + '" href="#/hafta/' + w.no + '">📖 Konu Anlatımı</a><a class="tab' + (tab === 'test' ? ' on' : '') + '" href="#/hafta/' + w.no + '/testler">✅ 5 Test</a><a class="tab' + (tab === 'sinav' ? ' on' : '') + '" href="#/hafta/' + w.no + '/sinav">📝 Sınav Kâğıdı</a></div>';
+      '<div class="tabs" ' + cssVar(t.color) + '><a class="tab' + (tab === 'ders' ? ' on' : '') + '" href="#/hafta/' + w.no + '">📖 Konu Anlatımı</a><a class="tab' + (tab === 'test' ? ' on' : '') + '" href="#/hafta/' + w.no + '/testler">✅ 5 Test</a><a class="tab' + (tab === 'oyun' ? ' on' : '') + '" href="#/hafta/' + w.no + '/oyun">🎮 Oyun</a><a class="tab' + (tab === 'sinav' ? ' on' : '') + '" href="#/hafta/' + w.no + '/sinav">📝 Sınav Kâğıdı</a></div>';
   }
   function viewLesson(w) {
     var t = temaOf(w.tema), i = WEEKS.indexOf(w);
-    var html = weekHead(w, 'ders') + '<div ' + cssVar(t.color) + '><div class="outcomes"><b>Öğrenme çıktıları (' + esc(w.code) + '):</b><ul>' + w.outcomes.map(function (o) { return '<li>' + esc(o) + '</li>'; }).join('') + '</ul></div><div class="card">';
+    var html = weekHead(w, 'ders') + '<div ' + cssVar(t.color) + '><div class="outcomes"><b>Öğrenme çıktıları:</b><ul>' + w.outcomes.map(function (o) { return '<li>' + esc(o) + '</li>'; }).join('') + '</ul></div><div class="card">';
     w.lesson.forEach(function (s, k) { html += '<div class="sec"><h3>' + (k + 1) + '. ' + esc(s.h) + '</h3>' + s.html + '</div>'; });
-    html += '</div><p><a class="btn" href="#/hafta/' + w.no + '/testler">Testlere geç →</a> <a class="btn alt" href="#/hafta/' + w.no + '/sinav">Sınav kâğıdı</a></p>';
+    html += '</div><p><a class="btn" href="#/hafta/' + w.no + '/testler">Testlere geç →</a> <a class="btn alt" href="#/hafta/' + w.no + '/oyun">🎮 Oyun</a> <a class="btn alt" href="#/hafta/' + w.no + '/sinav">Sınav kâğıdı</a></p>';
     html += '<p class="note no-print">' + (i > 0 ? '<a href="#/hafta/' + WEEKS[i - 1].no + '">← Hafta ' + WEEKS[i - 1].no + ': ' + esc(WEEKS[i - 1].title) + '</a>' : '') + (i < WEEKS.length - 1 ? ' &nbsp;|&nbsp; <a href="#/hafta/' + WEEKS[i + 1].no + '">Hafta ' + WEEKS[i + 1].no + ': ' + esc(WEEKS[i + 1].title) + ' →</a>' : '') + '</p></div>';
     return html;
   }
@@ -127,7 +127,7 @@
   }
   function viewExam(w) {
     var t = temaOf(w.tema), qs = QZ.buildExam(w);
-    return { html: weekHead(w, 'sinav') + paperHtml('6. Sınıf Matematik – ' + w.title, 'Hafta ' + w.no + ' • ' + w.code + ' • ' + QZ.EXAM_SIZE + ' soru • Süre: 40 dakika', qs, t.color), after: wirePaper };
+    return { html: weekHead(w, 'sinav') + paperHtml('6. Sınıf Matematik – ' + w.title, 'Hafta ' + w.no + ' • ' + QZ.EXAM_SIZE + ' soru • Süre: 40 dakika', qs, t.color), after: wirePaper };
   }
   function viewTemaExam(id) {
     var t = temaOf(id), qs = QZ.buildTemaExam(id);
@@ -136,7 +136,74 @@
   }
 
   function viewAbout() {
-    return '<h1>Hakkında</h1><div class="card"><p>Bu uygulama, MEB Talim ve Terbiye Kurulu’nun <b>Türkiye Yüzyılı Maarif Modeli Ortaokul Matematik Dersi (6. Sınıf)</b> öğretim programındaki <b>1–6. temalar</b> için hazırlanmıştır: Sayılar ve Nicelikler (1), İşlemlerle Cebirsel Düşünme ve Değişimler, Geometrik Şekiller, Geometrik Nicelikler, İstatistiksel Araştırma Süreci, Veriden Olasılığa.</p><ul><li>Her haftalık konuda: öğrenme çıktıları, ders akışı, çözümlü örnekler ve etkinlik önerileri.</li><li>Her konu için <b>5 test</b> (6’şar soru) ve bir <b>10 soruluk sınav kâğıdı</b>; her ünite için ayrıca <b>20 soruluk ünite sınavı</b>.</li><li>Sınav kâğıdını “Yazdır / PDF” düğmesiyle çıktı alabilirsiniz; cevap anahtarı ayrı sayfada yer alır.</li></ul><p class="note">Haftalara bölme, dersin ders saatlerine göre öneridir. Sorular programatik olarak üretilir; sayılar her testte farklıdır ve cevaplar otomatik hesaplanır.</p></div>';
+    return '<h1>Hakkında</h1><div class="card"><p>Bu uygulama, MEB Talim ve Terbiye Kurulu’nun <b>Türkiye Yüzyılı Maarif Modeli Ortaokul Matematik Dersi (6. Sınıf)</b> öğretim programındaki <b>1–6. temalar</b> için hazırlanmıştır: Sayılar ve Nicelikler (1), İşlemlerle Cebirsel Düşünme ve Değişimler, Geometrik Şekiller, Geometrik Nicelikler, İstatistiksel Araştırma Süreci, Veriden Olasılığa.</p><ul><li>Her haftalık konuda: öğrenme çıktıları, ders akışı, çözümlü örnekler ve etkinlik önerileri.</li><li>Her konu için <b>5 test</b> (20’şer soru), her konu için <b>Kahoot tarzı oyun</b> ve bir <b>10 soruluk sınav kâğıdı</b>; her ünite için ayrıca <b>20 soruluk ünite sınavı</b>.</li><li>Sınav kâğıdını “Yazdır / PDF” düğmesiyle çıktı alabilirsiniz; cevap anahtarı ayrı sayfada yer alır.</li></ul><p class="note">Haftalara bölme, dersin ders saatlerine göre öneridir. Sorular programatik olarak üretilir; sayılar her testte farklıdır ve cevaplar otomatik hesaplanır.</p></div>';
+  }
+
+
+  // ---------------- Kahoot tarzı oyun ----------------
+  var TILES = [{ c: '#e21b3c', s: '▲' }, { c: '#1368ce', s: '◆' }, { c: '#d89e00', s: '●' }, { c: '#26890c', s: '■' }];
+  function viewGame(w) {
+    var t = temaOf(w.tema);
+    var html = weekHead(w, 'oyun') + '<div id="game" class="game"></div>';
+    return { html: html, after: function () { gameSetup(w, document.getElementById('game')); } };
+  }
+  function gameSetup(w, root) {
+    var top = load('game:top:' + w.no, []);
+    root.innerHTML = '<div class="g-panel"><h2>🎮 ' + esc(w.title) + '</h2><p>Kahoot tarzı oyun: ' + 20 + ' soru, her soruda süre var. Ne kadar hızlı doğru cevaplarsan o kadar çok puan! Üst üste doğrular seri bonusu kazandırır.</p>' +
+      '<div class="g-row"><label>Mod</label><select id="gm"><option value="solo">Tek oyuncu</option><option value="team">Takım yarışması (sınıf, tek ekran)</option></select></div>' +
+      '<div class="g-row" id="gnameRow"><label>Adın</label><input id="gname" maxlength="20" placeholder="Takma adın" value="' + esc(load('game:name', '')) + '"></div>' +
+      '<div class="g-row hidden" id="gteamRow"><label>Takım sayısı</label><select id="gtc"><option>2</option><option selected>3</option><option>4</option></select><span class="note">Takımlar sırayla soru cevaplar.</span></div>' +
+      '<div class="g-row"><label>Süre (sn)</label><select id="gt"><option>15</option><option selected>20</option><option>30</option><option>45</option></select></div>' +
+      '<button class="btn g-start" id="gstart">Oyunu Başlat ▶</button></div>' +
+      (top.length ? '<div class="g-panel"><h3>🏆 En yüksek skorlar (bu cihaz)</h3><ol>' + top.map(function (x) { return '<li><b>' + esc(x.n) + '</b> — ' + x.s + ' puan</li>'; }).join('') + '</ol></div>' : '');
+    var gm = root.querySelector('#gm');
+    gm.onchange = function () { var team = gm.value === 'team'; root.querySelector('#gnameRow').classList.toggle('hidden', team); root.querySelector('#gteamRow').classList.toggle('hidden', !team); };
+    root.querySelector('#gstart').onclick = function () {
+      var team = gm.value === 'team', n = team ? +root.querySelector('#gtc').value : 1, players = [];
+      for (var i = 0; i < n; i++) players.push({ name: team ? ['Kırmızı', 'Mavi', 'Sarı', 'Yeşil'][i] + ' Takım' : (root.querySelector('#gname').value.trim() || 'Oyuncu'), color: TILES[i].c, score: 0, streak: 0, ok: 0 });
+      if (!team) save('game:name', players[0].name);
+      gameRun(w, root, players, +root.querySelector('#gt').value, team);
+    };
+  }
+  function gameRun(w, root, players, limit, team) {
+    var qs = QZ.buildGame(w), i = 0, cur = 0, timer = null, start = 0, answered = false;
+    function show() {
+      var q = qs[i], p = players[cur]; answered = false;
+      root.innerHTML = '<div class="g-top"><span>Soru ' + (i + 1) + '/' + qs.length + '</span><span class="g-who" style="background:' + p.color + '">' + esc(p.name) + '</span><span>⭐ ' + p.score + (p.streak > 1 ? ' 🔥' + p.streak : '') + '</span></div>' +
+        '<div class="g-bar"><i id="gbar"></i><b id="gsec">' + limit + '</b></div><div class="g-q">' + q.q + (q.fig || '') + '</div><div class="g-tiles">' +
+        q.opts.map(function (o, j) { return '<button class="g-tile" data-j="' + j + '" style="background:' + TILES[j].c + '"><span class="g-sym">' + TILES[j].s + '</span><span>' + o + '</span></button>'; }).join('') + '</div>';
+      start = Date.now(); clearInterval(timer);
+      timer = setInterval(function () {
+        var el = (Date.now() - start) / 1000, left = Math.max(0, limit - el);
+        var bar = document.getElementById('gbar'), sec = document.getElementById('gsec'); if (!bar) { clearInterval(timer); return; }
+        bar.style.width = (left / limit * 100) + '%'; sec.textContent = Math.ceil(left);
+        if (left <= 0) { clearInterval(timer); pick(-1); }
+      }, 100);
+      [].forEach.call(root.querySelectorAll('.g-tile'), function (b) { b.onclick = function () { pick(+b.getAttribute('data-j')); }; });
+    }
+    function pick(j) {
+      if (answered) return; answered = true; clearInterval(timer);
+      var q = qs[i], p = players[cur], el = (Date.now() - start) / 1000, ok = j === q.ans, pts = 0;
+      if (ok) { p.streak++; p.ok++; pts = Math.round(1000 * (1 - Math.min(1, el / limit) / 2)) + 100 * Math.min(p.streak - 1, 5); p.score += pts; } else p.streak = 0;
+      var tiles = root.querySelectorAll('.g-tile');
+      [].forEach.call(tiles, function (b, k) { b.disabled = true; if (k !== q.ans) b.classList.add('dim'); else b.classList.add('right'); });
+      var box = document.createElement('div'); box.className = 'g-fb ' + (ok ? 'ok' : 'no');
+      box.innerHTML = '<div><b>' + (ok ? '✅ Doğru! +' + pts : (j < 0 ? '⏰ Süre doldu' : '❌ Yanlış')) + '</b>' + (q.exp ? '<div class="g-exp">' + q.exp + '</div>' : '') + '</div><button class="btn" id="gnext">' + (i === qs.length - 1 ? 'Sonuçlar 🏁' : 'Sonraki ▶') + '</button>';
+      root.appendChild(box);
+      document.getElementById('gnext').onclick = next; document.getElementById('gnext').focus();
+    }
+    function next() { i++; if (team) cur = (cur + 1) % players.length; if (i >= qs.length) end(); else show(); }
+    function end() {
+      var sorted = players.slice().sort(function (a, b) { return b.score - a.score; });
+      if (!team) { var top = load('game:top:' + w.no, []); top.push({ n: players[0].name, s: players[0].score }); top.sort(function (a, b) { return b.s - a.s; }); save('game:top:' + w.no, top.slice(0, 5)); }
+      var medals = ['🥇', '🥈', '🥉', '4.'];
+      root.innerHTML = '<div class="g-panel g-end"><h2>🏁 Oyun bitti!</h2>' + (team ? '' : '<p class="g-big">' + players[0].score + ' puan</p><p>' + players[0].ok + '/' + qs.length + ' doğru ' + (players[0].ok >= 18 ? '— Harika! 🌟' : players[0].ok >= 14 ? '— Çok iyi! 👏' : players[0].ok >= 10 ? '— İyi, biraz daha çalış 💪' : '— Konuyu tekrar edelim 📖') + '</p>') +
+        (team ? '<div class="g-podium">' + sorted.map(function (p, k) { return '<div class="g-pl" style="border-color:' + p.color + '"><span>' + medals[k] + '</span><b>' + esc(p.name) + '</b><span>' + p.score + ' puan • ' + p.ok + ' doğru</span></div>'; }).join('') + '</div>' : '') +
+        '<p><button class="btn" id="gagain">Tekrar oyna</button> <a class="btn alt" href="#/hafta/' + w.no + '/testler">Testlere git</a></p></div>';
+      document.getElementById('gagain').onclick = function () { gameSetup(w, root); };
+    }
+    document.onkeydown = function (e) { if (!document.getElementById('game')) { document.onkeydown = null; return; } var k = +e.key; if (k >= 1 && k <= 4 && !answered && root.querySelector('.g-tile')) pick(k - 1); else if ((e.key === 'Enter') && answered && document.getElementById('gnext')) document.getElementById('gnext').click(); };
+    show();
   }
 
   // ---------------- Simülatörler ----------------
@@ -192,6 +259,7 @@
       if (!p[2]) out = { html: viewLesson(w) };
       else if (p[2] === 'testler') out = { html: viewTests(w) };
       else if (p[2] === 'test') { var k = +p[3]; out = (k >= 1 && k <= QZ.TEST_COUNT) ? viewTest(w, k) : { html: viewTests(w) }; }
+      else if (p[2] === 'oyun') out = viewGame(w);
       else if (p[2] === 'sinav') out = viewExam(w);
       else out = { html: viewLesson(w) };
     } else out = { html: '<h1>Sayfa bulunamadı</h1><p><a href="#/">Ana sayfaya dön</a></p>' };
