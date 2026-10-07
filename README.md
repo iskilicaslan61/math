@@ -5,3 +5,7 @@ Statik web uygulaması (derleme gerekmez). `index.html` dosyasını tarayıcıda
 - 6 tema, 29 haftalık konu: konu anlatımı, çözümlü örnekler, etkinlikler
 - Her konu için 5 test (6'şar soru), 10 soruluk yazdırılabilir sınav kâğıdı, her tema için 20 soruluk ünite sınavı
 - Sorular `js/tema*.js` içindeki üreticilerle oluşturulur; cevaplar otomatik hesaplanır
+
+## Yayınlama (GitHub Pages)
+Settings → Pages → Source: **Deploy from a branch** → Branch: `claude/epic-goodall-bzgdgo` (veya `main`), klasör: `/ (root)` → Save.
+Adres: https://iskilicaslan61.github.io/math/
