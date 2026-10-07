@@ -133,8 +133,9 @@
     function place(cx0, cy0, bis, letter) {
       var a = bis * Math.PI / 180;
       var x = cx0 + r * Math.cos(a), y = cy0 - r * Math.sin(a);
-      var t = lab[letter] !== undefined ? lab[letter] : letter;
-      var cls = lab[letter] !== undefined && /\d|\?/.test(String(t)) ? 'ang known' : 'ang';
+      var t = lab[letter] !== undefined ? lab[letter] : letter, bang = typeof t === 'string' && t.charAt(0) === '!';
+      if (bang) t = t.slice(1);
+      var cls = (lab[letter] !== undefined && /\d|\?/.test(String(t))) || bang ? 'ang known' : 'ang';
       return txt(x, y + 5, t, { size: 13, cls: cls });
     }
     var T = (180 - A);          // yukarı-sağ ışının açısı (derece)

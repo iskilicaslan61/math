@@ -51,8 +51,13 @@
   }
   function viewLesson(w) {
     var t = temaOf(w.tema), GW = WEEKS.filter(function (x) { return gr(x) === gr(w); }), i = GW.indexOf(w);
-    var html = weekHead(w, 'ders') + '<div ' + cssVar(t.color) + '><div class="outcomes"><b>Öğrenme çıktıları:</b><ul>' + w.outcomes.map(function (o) { return '<li>' + esc(o) + '</li>'; }).join('') + '</ul></div><div class="lesson">';
+    var html = weekHead(w, 'ders') + '<div ' + cssVar(t.color) + '><div class="outcomes"><b>Öğrenme çıktıları:</b><ul>' + w.outcomes.map(function (o) { return '<li>' + esc(o) + '</li>'; }).join('') + '</ul></div><div class="lesson"><div class="lesson-tools no-print"><button class="btn sm alt" id="allc">Tümünü kapat</button> <button class="btn sm alt" id="allo">Tümünü aç</button></div>';
     w.lesson.forEach(function (s, k) { html += '<div class="sec reveal"><h3><span class="snum">' + (k + 1) + '</span><span class="sico">' + secIcon(s.h) + '</span>' + esc(s.h) + '</h3>' + s.html + '</div>'; });
+    if (window.VIS && VIS[w.no]) {
+      html += '<div class="sec reveal vsec"><h3><span class="snum">★</span><span class="sico">🖼️</span>Görsellerle Öğren <small class="note">(başlıklara tıkla: aç / kapat)</small></h3>';
+      VIS[w.no].forEach(function (v) { html += '<details class="fold"' + (v.open ? ' open' : '') + '><summary>' + v.t + '</summary><div class="foldbody">' + v.h + '</div></details>'; });
+      html += '</div>';
+    }
     html += '</div><div class="donebox no-print"><button class="btn" id="anl">' + (load('done:' + w.no, false) ? '🎉 Tamamlandı!' : '✅ Konuyu anladım!') + '</button><span class="note">Bitirince tıkla, konfeti patlasın!</span></div><p><a class="btn" href="#/hafta/' + w.no + '/testler">Testlere geç →</a> <a class="btn alt" href="#/hafta/' + w.no + '/oyun">🎮 Oyun</a> <a class="btn alt" href="#/hafta/' + w.no + '/sinav">Sınav kâğıdı</a></p>';
     html += '<p class="note no-print">' + (i > 0 ? '<a href="#/hafta/' + GW[i - 1].no + '">← Hafta ' + wn(GW[i - 1]) + ': ' + esc(GW[i - 1].title) + '</a>' : '') + (i < GW.length - 1 ? ' &nbsp;|&nbsp; <a href="#/hafta/' + GW[i + 1].no + '">Hafta ' + wn(GW[i + 1]) + ': ' + esc(GW[i + 1].title) + ' →</a>' : '') + '</p></div>';
     return { html: html, after: function () { lessonFx(w); } };
@@ -73,10 +78,18 @@
       var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: .08 });
       [].forEach.call(secs, function (s) { io.observe(s); });
     } else [].forEach.call(secs, function (s) { s.classList.add('in'); });
+    [].forEach.call(document.querySelectorAll('.sec h3'), function (h) { h.onclick = function () { h.parentNode.classList.toggle('closed'); }; });
+    [].forEach.call(document.querySelectorAll('details.fold'), function (d) {
+      function pop() { var els = d.querySelectorAll('svg.vis > *:not(defs)'); [].forEach.call(els, function (e, i) { e.classList.remove('pp'); void e.getBoundingClientRect; e.style.animationDelay = Math.min(i * 35, 1400) + 'ms'; e.classList.add('pp'); }); [].forEach.call(d.querySelectorAll('.hop'), function (e, i) { e.style.animationDelay = (i * 0.15) + 's'; }); }
+      d.addEventListener('toggle', function () { if (d.open) pop(); }); if (d.open) pop();
+    });
     var head = document.querySelector('.wk-head');
     if (head) { var sy = ['∑', 'π', '÷', '×', '+', '−', '√', '%', '=', '∞']; for (var i = 0; i < 8; i++) { var f = document.createElement('span'); f.className = 'fl'; f.textContent = sy[(i * 3 + w.no) % sy.length]; f.style.left = (8 + i * 12) + '%'; f.style.animationDelay = (i * .5) + 's'; f.style.fontSize = (18 + (i % 3) * 8) + 'px'; head.appendChild(f); } }
     var prog = document.getElementById('prog'); if (!prog) { prog = document.createElement('div'); prog.id = 'prog'; document.body.appendChild(prog); }
     window.onscroll = function () { var h = document.documentElement; var pr = h.scrollTop / ((h.scrollHeight - h.clientHeight) || 1); var p2 = document.getElementById('prog'); if (p2) p2.style.width = (pr * 100) + '%'; else window.onscroll = null; };
+    var ac = document.getElementById('allc'), ao = document.getElementById('allo');
+    if (ac) ac.onclick = function () { [].forEach.call(document.querySelectorAll('.sec'), function (s) { s.classList.add('closed'); }); };
+    if (ao) ao.onclick = function () { [].forEach.call(document.querySelectorAll('.sec'), function (s) { s.classList.remove('closed'); }); };
     var b = document.getElementById('anl');
     if (b) b.onclick = function () { confetti(); save('done:' + w.no, true); b.textContent = '🎉 Tamamlandı!'; };
   }
@@ -264,7 +277,7 @@
   function hydrate() {
     [].forEach.call(document.querySelectorAll('[data-widget]'), function (el) {
       var k = el.getAttribute('data-widget');
-      if (k === 'coin') coinSim(el); else if (k === 'dice') diceSim(el); else if (k === 'spinner') spinSim(el);
+      if (k === 'coin') coinSim(el); else if (k === 'dice') diceSim(el); else if (k === 'spinner') spinSim(el); else if (window.VISW && VISW[k]) VISW[k](el);
     });
   }
   function simShell(el, title, faces, drawer) {
