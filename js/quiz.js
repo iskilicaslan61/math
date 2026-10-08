@@ -23,6 +23,16 @@
     return out;
   }
   function buildTest(week, t) { return build(week, 'w' + week.no + '-test' + t, TEST_SIZE); }
+  function buildTemaTest(temaId, k) {
+    var weeks = WEEKS.filter(function (w) { return w.tema === temaId; }), per = Math.ceil(TEST_SIZE / weeks.length) + 2;
+    var lists = weeks.map(function (w) { return build(w, 'tema' + temaId + '-p' + k + '-w' + w.no, per); }), out = [], seen = {}, i = 0;
+    while (out.length < TEST_SIZE && lists.some(function (l) { return l.length > i; })) {
+      lists.forEach(function (l) { var x = l[i]; if (x && out.length < TEST_SIZE) { var key = x.q + '|' + x.opts.join('/'); if (!seen[key]) { seen[key] = 1; out.push(x); } } });
+      i++;
+    }
+    return out;
+  }
+  function buildMini(week, n) { return build(week, 'w' + week.no + '-mini', n || 4); }
   function buildGame(week) { return build(week, 'w' + week.no + '-game', 20); }
   function buildExam(week) { return build(week, 'w' + week.no + '-exam', EXAM_SIZE); }
   function buildTemaExam(temaId) {
@@ -33,5 +43,5 @@
     var rng = MC.makeRng('tema' + temaId + '-mix');
     return rng.shuffle(all).slice(0, TEMA_EXAM_SIZE);
   }
-  global.QZ = { buildTest: buildTest, buildExam: buildExam, buildGame: buildGame, buildTemaExam: buildTemaExam, TEST_COUNT: TEST_COUNT, TEST_SIZE: TEST_SIZE, EXAM_SIZE: EXAM_SIZE, TEMA_EXAM_SIZE: TEMA_EXAM_SIZE };
+  global.QZ = { buildTest: buildTest, buildExam: buildExam, buildGame: buildGame, buildTemaTest: buildTemaTest, buildMini: buildMini, buildTemaExam: buildTemaExam, TEST_COUNT: TEST_COUNT, TEST_SIZE: TEST_SIZE, EXAM_SIZE: EXAM_SIZE, TEMA_EXAM_SIZE: TEMA_EXAM_SIZE };
 })(window);

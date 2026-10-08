@@ -232,4 +232,5 @@
       ['#ia', '#ib', '#ic'].forEach(function (id) { el.querySelector(id).oninput = draw; }); draw();
     }
   };
+  window.VH = { sv: sv, R: R, T: T, Ln: Ln, Ar: Ar, P: P, C: C, G: G, gridN: gridN, numLine: numLine, iso: iso, cuboid: cuboid, pie: pie, coord: coord, tri: tri, machine: machine, bars: bars, cap: cap, add: add };
 })();

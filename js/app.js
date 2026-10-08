@@ -29,7 +29,7 @@
     html += '<p class="note">Haftalık plan, her hafta yaklaşık 5 ders saati varsayımıyla hazırlanmıştır; kendi yıllık planınıza göre kaydırabilirsiniz. Test soruları sayısal değerleriyle her test için farklı üretilir, aynı test her açılışta aynı sorularla gelir.</p>';
     TM.forEach(function (t) {
       var ws = WEEKS.filter(function (w) { return w.tema === t.id; });
-      html += '<section class="tema" ' + cssVar(t.color) + '><div class="tema-h"><div><span class="pill">' + tn(t) + '. Tema • ' + t.hours + ' ders saati</span><h2>' + esc(t.title) + '</h2><p>' + esc(t.summary) + '</p></div><div><a class="btn alt sm" href="#/tema/' + t.id + '/sinav">📝 Ünite Sınavı</a></div></div><div class="weeks">';
+      html += '<section class="tema" ' + cssVar(t.color) + '><div class="tema-h"><div><span class="pill">' + tn(t) + '. Tema • ' + t.hours + ' ders saati</span><h2>' + esc(t.title) + '</h2><p>' + esc(t.summary) + '</p></div><div class="tbtns"><a class="btn alt sm" href="#/tema/' + t.id + '/pekistirme">🔁 Pekiştirme Testleri</a> <a class="btn alt sm" href="#/tema/' + t.id + '/sinav">📝 Ünite Sınavı</a></div></div><div class="weeks">';
       ws.forEach(function (w) {
         var p = weekProgress(w.no);
         html += '<a class="wk" href="#/hafta/' + w.no + '"><div class="n">Hafta ' + wn(w) + '</div><div class="t">' + (load('done:' + w.no, false) ? '✅ ' : '') + esc(w.title) + '</div><div class="m"><span>' + w.hours + ' ders saati</span><span>' + p + '/' + QZ.TEST_COUNT + ' test</span></div><div class="bar"><i style="width:' + p * 100 / QZ.TEST_COUNT + '%"></i></div></a>';
@@ -58,6 +58,13 @@
       VIS[w.no].forEach(function (v) { html += '<details class="fold"' + (v.open ? ' open' : '') + '><summary>' + v.t + '</summary><div class="foldbody">' + v.h + '</div></details>'; });
       html += '</div>';
     }
+    var ex = window.EXTRA && EXTRA[w.no];
+    if (ex) {
+      html += '<div class="sec reveal"><h3><span class="snum">✔</span><span class="sico">📝</span>Kısa Özet</h3><ul class="ozet">' + ex.o.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul></div>';
+      html += '<div class="sec reveal"><h3><span class="snum">🌍</span><span class="sico">🏠</span>Günlük Hayatta</h3><p>' + ex.h + '</p></div>';
+      html += '<div class="sec reveal"><h3><span class="snum">?</span><span class="sico">🤔</span>Biliyor muydun?</h3><div class="box tip">' + ex.m + '</div></div>';
+    }
+    html += '<div class="sec reveal"><h3><span class="snum">🧠</span><span class="sico">🎯</span>Kendimi Yokla</h3><p class="note">4 hızlı soru: bir şıkka tıkla, doğru cevap ve çözüm hemen görünsün.</p><div class="miniq" id="miniq"></div></div>';
     html += '</div><div class="donebox no-print"><button class="btn" id="anl">' + (load('done:' + w.no, false) ? '🎉 Tamamlandı!' : '✅ Konuyu anladım!') + '</button><span class="note">Bitirince tıkla, konfeti patlasın!</span></div><p><a class="btn" href="#/hafta/' + w.no + '/testler">Testlere geç →</a> <a class="btn alt" href="#/hafta/' + w.no + '/oyun">🎮 Oyun</a> <a class="btn alt" href="#/hafta/' + w.no + '/sinav">Sınav kâğıdı</a></p>';
     html += '<p class="note no-print">' + (i > 0 ? '<a href="#/hafta/' + GW[i - 1].no + '">← Hafta ' + wn(GW[i - 1]) + ': ' + esc(GW[i - 1].title) + '</a>' : '') + (i < GW.length - 1 ? ' &nbsp;|&nbsp; <a href="#/hafta/' + GW[i + 1].no + '">Hafta ' + wn(GW[i + 1]) + ': ' + esc(GW[i + 1].title) + ' →</a>' : '') + '</p></div>';
     return { html: html, after: function () { lessonFx(w); } };
@@ -67,9 +74,9 @@
     for (var i = 0; i < m.length; i++) if (m[i][0].test(h)) return m[i][1];
     return '📘';
   }
-  function confetti() {
+  function confetti(small) {
     var cols = ['#ff4d6d', '#ffd166', '#06d6a0', '#4cc9f0', '#8e44ad', '#ff9f1c'], box = document.createElement('div'); box.className = 'confetti';
-    for (var i = 0; i < 70; i++) { var p = document.createElement('i'); p.style.left = Math.random() * 100 + '%'; p.style.background = cols[i % cols.length]; p.style.animationDelay = Math.random() * .6 + 's'; p.style.animationDuration = 1.6 + Math.random() * 1.4 + 's'; p.style.transform = 'rotate(' + Math.random() * 360 + 'deg)'; box.appendChild(p); }
+    for (var i = 0; i < (small ? 24 : 70); i++) { var p = document.createElement('i'); p.style.left = Math.random() * 100 + '%'; p.style.background = cols[i % cols.length]; p.style.animationDelay = Math.random() * .6 + 's'; p.style.animationDuration = 1.6 + Math.random() * 1.4 + 's'; p.style.transform = 'rotate(' + Math.random() * 360 + 'deg)'; box.appendChild(p); }
     document.body.appendChild(box); setTimeout(function () { box.remove(); }, 3500);
   }
   function lessonFx(w) {
@@ -90,6 +97,9 @@
     var ac = document.getElementById('allc'), ao = document.getElementById('allo');
     if (ac) ac.onclick = function () { [].forEach.call(document.querySelectorAll('.sec'), function (s) { s.classList.add('closed'); }); };
     if (ao) ao.onclick = function () { [].forEach.call(document.querySelectorAll('.sec'), function (s) { s.classList.remove('closed'); }); };
+    var mq = document.getElementById('miniq');
+    if (mq) { var ms = QZ.buildMini(w, 4); mq.innerHTML = ms.map(function (q, i) { return '<div class="mq" data-i="' + i + '"><div class="mq-t"><b>' + (i + 1) + '.</b> ' + q.q + '</div>' + (q.fig || '') + '<div class="mq-o">' + q.opts.map(function (o, j) { return '<button type="button" data-j="' + j + '">' + LET[j] + ') ' + o + '</button>'; }).join('') + '</div><div class="mq-e hidden"></div></div>'; }).join('');
+      mq.onclick = function (e) { var b2 = e.target.closest('button'); if (!b2) return; var box = b2.closest('.mq'), q = ms[+box.getAttribute('data-i')], j = +b2.getAttribute('data-j'); if (box.getAttribute('data-done')) return; box.setAttribute('data-done', 1); [].forEach.call(box.querySelectorAll('button'), function (x, k) { x.disabled = true; if (k === q.ans) x.classList.add('right'); else if (k === j) x.classList.add('wrong'); }); var ee = box.querySelector('.mq-e'); ee.classList.remove('hidden'); ee.innerHTML = (j === q.ans ? '✅ Doğru! ' : '❌ Doğru cevap ' + LET[q.ans] + '. ') + (q.exp || ''); if (j === q.ans) confetti(true); }; }
     var b = document.getElementById('anl');
     if (b) b.onclick = function () { confetti(); save('done:' + w.no, true); b.textContent = '🎉 Tamamlandı!'; };
   }
@@ -105,7 +115,7 @@
 
   // ---------------- Test ----------------
   function qHtml(q, i, mode) {
-    var h = '<div class="q" data-i="' + i + '"><div class="qn">' + (i + 1) + '</div><div class="qb"><div class="qt">' + q.q + '</div>' + (q.fig || '') + '<ul class="opts">';
+    var h = '<div class="q" data-i="' + i + '"><div class="qn">' + (i + 1) + '</div><div class="qb"><div class="qt">' + q.q + '</div>' + (q.fig || '') + '<button type="button" class="solve-btn no-print">✏️ Beyaz sayfada çöz</button><ul class="opts">';
     q.opts.forEach(function (o, j) { h += '<li><label><input type="radio" name="q' + i + '" value="' + j + '"><span class="lt">' + LET[j] + ')</span><span>' + o + '</span></label></li>'; });
     return h + '</ul><div class="exp hidden"></div></div></div>';
   }
@@ -118,6 +128,11 @@
   }
   function wireQuiz(w, k, qs) {
     var root = document.getElementById('quiz'), done = false;
+    root.addEventListener('click', function (e) {
+      var box = e.target.closest('.q'); if (!box || !(e.target.closest('.solve-btn') || e.target.closest('.qt') || e.target.closest('.qn'))) return;
+      var i = +box.getAttribute('data-i');
+      openPad(qs[i], i + 1, 'q:' + w.no + ':' + k + ':' + i, { get: function () { var c = box.querySelector('input:checked'); return c ? +c.value : -1; }, set: function (j) { var inp = box.querySelectorAll('input')[j]; if (inp && !inp.disabled) { inp.checked = true; inp.dispatchEvent(new Event('change', { bubbles: true })); } }, locked: function () { return done; } });
+    });
     function answered() { return root.querySelectorAll('input:checked').length; }
     root.addEventListener('change', function (e) {
       if (done) return;
@@ -147,6 +162,61 @@
     document.getElementById('retry').onclick = function () { route(); window.scrollTo(0, 0); };
   }
 
+
+  // ---------------- Beyaz sayfa (soru çözme) ----------------
+  var padMem = {}, pad = null;
+  function openPad(q, num, key, sync) {
+    if (!pad) {
+      pad = document.createElement('div'); pad.id = 'pad'; pad.className = 'pad hidden';
+      pad.innerHTML = '<div class="pad-top"><b id="padno"></b><span class="pad-hint">Parmağınla, kalemle ya da fareyle yaz</span><button class="btn sm" id="padx">✕ Kapat</button></div><div class="pad-q" id="padq"></div>' +
+        '<div class="pad-tools"><button data-t="pen" class="on">✏️ Kalem</button><button data-t="eraser">🧽 Silgi</button>' +
+        ['#111111', '#1d4ed8', '#dc2626', '#16a34a', '#d97706'].map(function (c, i) { return '<i class="sw' + (i === 0 ? ' on' : '') + '" data-c="' + c + '" style="background:' + c + '"></i>'; }).join('') +
+        '<input type="range" id="padsz" min="1" max="12" value="3" title="Kalınlık"><select id="padbg"><option value="blank">Boş</option><option value="lined">Çizgili</option><option value="grid" selected>Kareli</option></select><button data-t="undo">↶ Geri al</button><button data-t="clear">🗑 Temizle</button></div>' +
+        '<div class="pad-wrap grid" id="padwrap"><canvas id="padc"></canvas></div>';
+      document.body.appendChild(pad);
+      pad.querySelector('#padbg').onchange = function () { pad.querySelector('#padwrap').className = 'pad-wrap ' + this.value; };
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && pad && !pad.classList.contains('hidden')) closePad(); });
+    }
+    var cv = pad.querySelector('#padc'), wrap = pad.querySelector('#padwrap'), ctx, tool = 'pen', color = '#111111', stack = [], drawing = false, last = null;
+    pad.querySelector('#padno').textContent = 'Soru ' + num;
+    var qh = '<div class="pq-text">' + q.q + '</div>' + (q.fig || '') + '<div class="pad-opts">' + q.opts.map(function (o, j) { return '<label><input type="radio" name="padopt" value="' + j + '"><b>' + LET[j] + ')</b> <span>' + o + '</span></label>'; }).join('') + '</div>';
+    pad.querySelector('#padq').innerHTML = qh;
+    var cur = sync && sync.get ? sync.get() : -1; [].forEach.call(pad.querySelectorAll('[name=padopt]'), function (r) { r.checked = (+r.value === cur); r.disabled = !!(sync && sync.locked && sync.locked()); r.onchange = function () { if (sync && sync.set) sync.set(+r.value); }; });
+    pad.classList.remove('hidden'); document.body.classList.add('pad-open');
+    function size() { var r = wrap.getBoundingClientRect(), dpr = window.devicePixelRatio || 1, w = Math.max(300, r.width), h = Math.max(240, r.height); var snap = cv.width ? cv.toDataURL() : padMem[key]; cv.width = w * dpr; cv.height = h * dpr; cv.style.width = w + 'px'; cv.style.height = h + 'px'; ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; if (snap) { var im = new Image(); im.onload = function () { ctx.drawImage(im, 0, 0, w, h); }; im.src = snap; } }
+    cv.width = 0; size();
+    function pos(e) { var r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+    cv.onpointerdown = function (e) { e.preventDefault(); cv.setPointerCapture(e.pointerId); drawing = true; stack.push(cv.toDataURL()); if (stack.length > 20) stack.shift(); last = pos(e); ctx.beginPath(); ctx.moveTo(last[0], last[1]); ctx.lineTo(last[0] + .01, last[1] + .01); stroke(); };
+    cv.onpointermove = function (e) { if (!drawing) return; var p = pos(e); ctx.beginPath(); ctx.moveTo(last[0], last[1]); ctx.lineTo(p[0], p[1]); stroke(); last = p; };
+    cv.onpointerup = cv.onpointercancel = function () { drawing = false; padMem[key] = cv.toDataURL(); };
+    function stroke() { var sz = +pad.querySelector('#padsz').value; ctx.globalCompositeOperation = tool === 'eraser' ? 'destination-out' : 'source-over'; ctx.strokeStyle = color; ctx.lineWidth = tool === 'eraser' ? sz * 5 : sz; ctx.stroke(); }
+    pad.querySelector('.pad-tools').onclick = function (e) {
+      var b = e.target.closest('button'), s = e.target.closest('.sw');
+      if (s) { color = s.getAttribute('data-c'); tool = 'pen'; [].forEach.call(pad.querySelectorAll('.sw'), function (x) { x.classList.toggle('on', x === s); }); [].forEach.call(pad.querySelectorAll('[data-t=pen],[data-t=eraser]'), function (x) { x.classList.toggle('on', x.getAttribute('data-t') === 'pen'); }); return; }
+      if (!b) return; var t = b.getAttribute('data-t');
+      if (t === 'pen' || t === 'eraser') { tool = t; [].forEach.call(pad.querySelectorAll('[data-t=pen],[data-t=eraser]'), function (x) { x.classList.toggle('on', x === b); }); }
+      else if (t === 'clear') { stack.push(cv.toDataURL()); ctx.clearRect(0, 0, cv.width, cv.height); padMem[key] = ''; }
+      else if (t === 'undo' && stack.length) { var im = new Image(), u = stack.pop(); im.onload = function () { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'source-over'; ctx.clearRect(0, 0, cv.width, cv.height); ctx.drawImage(im, 0, 0); ctx.restore(); padMem[key] = cv.toDataURL(); }; im.src = u; }
+    };
+    pad.querySelector('#padx').onclick = closePad;
+    function closePad() { padMem[key] = cv.toDataURL(); pad.classList.add('hidden'); document.body.classList.remove('pad-open'); }
+  }
+
+  // ---------------- Pekiştirme testleri ----------------
+  function viewTemaTests(t) {
+    var html = '<div class="crumbs"><a href="' + homeHref(t) + '">Yıllık Plan</a> › ' + tn(t) + '. Tema: ' + esc(t.title) + ' › Pekiştirme</div><div class="wk-head" ' + cssVar(t.color) + '><span class="pill">' + tn(t) + '. Tema • Pekiştirme Testleri</span><h1>' + esc(t.title) + '</h1></div><p class="lead">Konuların hepsinden karışık ' + QZ.TEST_COUNT + ' pekiştirme testi. Her testte ' + QZ.TEST_SIZE + ' soru var.</p><div class="testlist" ' + cssVar(t.color) + '>';
+    for (var k = 1; k <= QZ.TEST_COUNT; k++) { var b = bestOf('p' + t.id, k); html += '<a class="tcard" href="#/tema/' + t.id + '/pekistirme/' + k + '"><span class="badge' + (b !== null && b >= QZ.TEST_SIZE - 2 ? ' good' : '') + '">' + (b === null ? 'Yeni' : 'En iyi ' + b + '/' + QZ.TEST_SIZE) + '</span><b>Pekiştirme ' + k + '</b><span>' + QZ.TEST_SIZE + ' soru • karışık</span></a>'; }
+    return html + '</div>';
+  }
+  function viewTemaTest(t, k) {
+    var qs = QZ.buildTemaTest(t.id, k), pw = { no: 'p' + t.id, tema: t.id };
+    var html = '<div class="crumbs"><a href="' + homeHref(t) + '">Yıllık Plan</a> › ' + tn(t) + '. Tema › <a href="#/tema/' + t.id + '/pekistirme">Pekiştirme</a> › Test ' + k + '</div><div class="wk-head" ' + cssVar(t.color) + '><span class="pill">' + tn(t) + '. Tema • Pekiştirme ' + k + '/' + QZ.TEST_COUNT + '</span><h1>' + esc(t.title) + '</h1></div><div class="card" ' + cssVar(t.color) + ' id="quiz">';
+    qs.forEach(function (q, i) { html += qHtml(q, i); });
+    var nxt = k < QZ.TEST_COUNT ? '<a class="btn alt hidden" id="nxt" href="#/tema/' + t.id + '/pekistirme/' + (k + 1) + '">Sonraki test →</a>' : '<a class="btn alt hidden" id="nxt" href="#/tema/' + t.id + '/sinav">Ünite sınavına geç →</a>';
+    html += '</div><div class="scorebar"><div id="sc" class="score">Cevapla: 0/' + qs.length + '</div><div><button class="btn" id="finish">Bitir ve Kontrol Et</button> <button class="btn alt hidden" id="retry">Tekrar dene</button> ' + nxt + '</div></div>';
+    return { html: html, after: function () { wireQuiz(pw, k, qs); } };
+  }
+
   // ---------------- Sınav kâğıdı ----------------
   function paperHtml(title, subtitle, qs, color) {
     var cnt = qs.length;
@@ -154,7 +224,7 @@
     var h = '<div class="tools no-print" ' + cssVar(color) + '><button class="btn" id="sub">✅ Teslim Et</button><button class="btn alt" id="rs">↺ Sıfırla</button><button class="btn alt" id="pr">🖨️ Yazdır / PDF</button><button class="btn alt" id="tk">Cevap anahtarını göster</button><span class="note" id="tm">⏱ 00:00</span><span class="note">Online çözmek için şıkları işaretleyip “Teslim Et”e basın. Her soru ' + MC.num(per) + ' puandır.</span></div><div id="result" class="result hidden no-print"></div>';
     h += '<article class="paper"><div class="ph"><h2>' + esc(title) + '</h2><small>' + esc(subtitle) + '</small></div><div class="pinfo"><div>Adı Soyadı: <input id="stname" class="no-print-in" maxlength="40" placeholder="adını yaz"></div><div>Sınıfı / No:</div><div>Tarih:</div></div>';
     qs.forEach(function (q, i) {
-      h += '<div class="pq" data-i="' + i + '"><div class="pn">' + (i + 1) + '.</div><div><div>' + q.q + ' <span class="pp">(' + MC.num(per) + ' p)</span></div>' + (q.fig || '') + '<div class="popts">';
+      h += '<div class="pq" data-i="' + i + '"><div class="pn">' + (i + 1) + '.</div><div><div>' + q.q + ' <span class="pp">(' + MC.num(per) + ' p)</span></div>' + (q.fig || '') + '<button type="button" class="solve-btn no-print">✏️ Beyaz sayfada çöz</button><div class="popts">';
       q.opts.forEach(function (o, j) { h += '<label class="po"><input type="radio" name="p' + i + '" value="' + j + '"><b>' + LET[j] + ')</b>' + o + '</label>'; });
       h += '</div></div></div>';
     });
@@ -167,6 +237,11 @@
     var t0 = Date.now(), done = false, tick;
     function fmt(s) { return (s < 600 ? '0' : '') + Math.floor(s / 60) + ':' + (s % 60 < 10 ? '0' : '') + (s % 60); }
     tick = setInterval(function () { var el = document.getElementById('tm'); if (!el) { clearInterval(tick); return; } if (!done) el.textContent = '⏱ ' + fmt(Math.floor((Date.now() - t0) / 1000)); }, 1000);
+    document.querySelector('.paper').addEventListener('click', function (e) {
+      var box = e.target.closest('.pq'); if (!box || !(e.target.closest('.solve-btn') || e.target.closest('.pn') || (e.target.closest('.pq > div:nth-child(2) > div:first-child')))) return;
+      var i = +box.getAttribute('data-i');
+      openPad(qs[i], i + 1, 'p:' + id + ':' + i, { get: function () { var c = box.querySelector('input:checked'); return c ? +c.value : -1; }, set: function (j) { var inp = box.querySelectorAll('input')[j]; if (inp && !inp.disabled) { inp.checked = true; } }, locked: function () { return done; } });
+    });
     pr.onclick = function () { window.print(); };
     tk.onclick = function () { var hid = key.classList.toggle('hidden'); tk.textContent = hid ? 'Cevap anahtarını göster' : 'Cevap anahtarını gizle'; };
     document.getElementById('rs').onclick = function () { clearInterval(tick); route(); window.scrollTo(0, 0); };
@@ -322,6 +397,7 @@
     else if (p[0] === 'sinif7') out = { html: viewHome(7) };
     else if (p[0] === 'hakkinda') out = { html: viewAbout() };
     else if (p[0] === 'tema' && p[2] === 'sinav' && temaOf(+p[1])) out = viewTemaExam(+p[1]);
+    else if (p[0] === 'tema' && p[2] === 'pekistirme' && temaOf(+p[1])) { var kk = +p[3]; out = (kk >= 1 && kk <= QZ.TEST_COUNT) ? viewTemaTest(temaOf(+p[1]), kk) : { html: viewTemaTests(temaOf(+p[1])) }; }
     else if (p[0] === 'hafta' && weekOf(+p[1])) {
       var w = weekOf(+p[1]);
       if (!p[2]) out = viewLesson(w);
