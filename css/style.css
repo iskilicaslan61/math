@@ -415,3 +415,16 @@ body.pad-open { overflow: hidden; }
 .mcard.flip .mf, .mcard.done .mf { transform: rotateY(180deg); } .mcard.flip .mb, .mcard.done .mb { transform: rotateY(360deg); } .mcard.done { opacity: .75; }
 @media (max-width: 600px) { .mem { grid-template-columns: repeat(3, 1fr); } .mcard { height: 100px; } }
 @media print { .banner, .no-print, #navx { display: none !important; } .report .vcards { grid-template-columns: repeat(4, 1fr); } }
+
+/* Rapor/kâğıt: koyu temada da okunur (beyaz zemin, koyu yazı) */
+.paper, .paper * { color-scheme: light; }
+.paper .note { color: #555 !important; }
+.paper.report .rep-comment, .paper .box { background: #eef2ff !important; color: #111 !important; animation: none !important; border: 1px solid #c7d2fe; border-left: 5px solid #4c4fef; }
+.paper .box b, .paper .box a { color: inherit; background: none; }
+.paper.report .rep-comment a { color: #1d4ed8; }
+.paper.report, .paper.report li, .paper.report p, .paper.report td, .paper.report th, .paper.report h2, .paper.report h3 { color: #111; }
+.paper.report .rep-n { color: #444 !important; }
+.paper .tbl th { background: #eceefb !important; color: #111 !important; } .paper .tbl td { color: #111 !important; background: #fff; }
+.paper .vcard span { color: #555 !important; } .paper .vcard b { color: var(--k) !important; }
+.paper .ws-box { background: #fff; color: #111; }
+.paper .box::before { display: none !important; }

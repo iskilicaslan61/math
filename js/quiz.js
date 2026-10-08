@@ -1,7 +1,7 @@
 /* Test ve sınav kâğıdı üretimi (tohumlu: her açılışta aynı sorular) */
 (function (global) {
   'use strict';
-  var TEST_COUNT = 5, PEK_COUNT = 10, TEST_SIZE = 20, EXAM_SIZE = 10, TEMA_EXAM_SIZE = 20;
+  var TEST_COUNT = 10, PEK_COUNT = 10, TEST_SIZE = 20, EXAM_SIZE = 10, TEMA_EXAM_SIZE = 20;
 
   function build(week, seed, count) {
     var rng = MC.makeRng(seed);
