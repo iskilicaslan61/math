@@ -24,7 +24,7 @@
     if (kind === 'pekistirme') return '#/tema/' + p[0] + '/pekistirme/' + p[1];
     if (kind === 'sinav') return '#/hafta/' + p[0] + '/sinav';
     if (kind === 'tsinav') return '#/tema/' + p[0] + '/sinav';
-    if (kind === 'hata') return '#/hata/coz';
+    if (kind === 'hata') return '#/hata/coz/' + (DB.user ? DB.user.grade : '');
     return '#/';
   }
   function go(h) { location.hash = h; }
@@ -77,6 +77,23 @@
     else html += '<div class="tblwrap"><table class="tbl"><thead><tr><th>Tarih</th><th>Tür</th><th>Konu</th><th>Sonuç</th><th>Süre</th></tr></thead><tbody>' + data.results.slice(0, 15).map(function (r) { return '<tr><td>' + dt(r.t) + '</td><td>' + (KIND[r.kind] || r.kind) + '</td><td>' + esc(refLabel(r.kind, r.ref)) + '</td><td><b>' + r.score + '/' + r.total + '</b> (%' + pct(r.score, r.total) + ')</td><td>' + (r.dur ? fmtDur(r.dur) : '—') + '</td></tr>'; }).join('') + '</tbody></table></div>';
     return html;
   }
+  // ---------- sınıfa göre ayırma (6. sınıf raporu ile 7. sınıf raporu karışmasın) ----------
+  function gW(no) { var w = X.weekOf(+no); return w ? X.gr(w) : null; }
+  function gT(id) { var t = X.temaOf(+id); return t ? X.gr(t) : null; }
+  function gRef(kind, ref) { var a = String(ref).split(':')[0]; if (kind === 'test' || kind === 'sinav' || kind === 'oyun') return gW(a); if (kind === 'pekistirme' || kind === 'tsinav') return gT(a); return null; }
+  function gKey(key) { var p = String(key).split('|'); return (p[0] === 'p' || p[0] === 'x') ? gT(p[1]) : gW(p[1]); }
+  function filterGrade(d, g) {
+    var rs = [];
+    d.results.forEach(function (r) {
+      var rg = gRef(r.kind, r.ref);
+      if (rg !== null) { if (rg === g) rs.push(r); return; }
+      var w = [], c = ''; (r.w || []).forEach(function (wk, i) { if (gW(wk) === g) { w.push(wk); c += (r.c || '')[i] || '-'; } });
+      if (w.length) rs.push({ kind: r.kind, ref: r.ref, score: (c.match(/1/g) || []).length, total: w.length, dur: r.dur, w: w, c: c, t: r.t });
+    });
+    return { results: rs, mistakes: d.mistakes.filter(function (m) { return gKey(m.key) === g; }), assignments: (d.assignments || []).filter(function (a) { var rg = gRef(a.kind, a.ref); return rg === null || rg === g; }), local: d.local };
+  }
+  function curGrade() { if (DB.user) return +DB.user.grade; return +X.load('lastGrade', 6) === 7 ? 7 : 6; }
+  function gradeTabs(base, g) { return DB.user ? '' : '<div class="gtabs no-print"><a class="gt' + (g === 6 ? ' on' : '') + '" href="' + base + '/6">6. Sınıf</a><a class="gt' + (g === 7 ? ' on' : '') + '" href="' + base + '/7">7. Sınıf</a></div>'; }
   function getData() { return DB.ready.then(function () { return DB.data(); }); }
 
   // ---------- gezinti çubuğu ve ana sayfa bandı ----------
@@ -89,6 +106,7 @@
     var l = $('lgo'); if (l) l.onclick = function (e) { e.preventDefault(); DB.logout(); nav(); go('#/'); };
   }
   X.after = function (p) {
+    var lg = null; if (p[0] === 'sinif7') lg = 7; else if (p[0] === '') lg = 6; else if (p[0] === 'hafta') { lg = gW(p[1]); } else if (p[0] === 'tema') { lg = gT(p[1]); } if (lg) X.save('lastGrade', lg);
     DB.ready.then(function () {
       nav();
       var b = $('homebanner'); if (!b) return;
@@ -120,35 +138,37 @@
     } };
   };
   // ---------- rapor ----------
-  X.routes.rapor = function () {
-    return { html: '<div class="no-print tools"><button class="btn" id="prr">🖨️ Yazdır / PDF</button></div><article class="paper report" id="rep">Yükleniyor…</article>', after: function () {
+  X.routes.rapor = function (p) {
+    var g = DB.user ? +DB.user.grade : (+p[1] === 6 || +p[1] === 7 ? +p[1] : curGrade());
+    return { html: '<div class="no-print tools"><button class="btn" id="prr">🖨️ Yazdır / PDF</button></div>' + gradeTabs('#/rapor', g) + '<article class="paper report" id="rep">Yükleniyor…</article>', after: function () {
       $('prr').onclick = function () { window.print(); };
-      getData().then(function (d) { var nm = DB.user ? DB.user.name : 'Öğrenci (bu cihaz)'; $('rep').innerHTML = reportHtml(d, nm, { grade: DB.user ? DB.user.grade : null, links: true }) + (d.local ? '<p class="note">Bu rapor yalnızca bu cihazdaki kayıtlardan hazırlandı.</p>' : ''); });
+      DB.ready.then(function () { if (!DB.user && p[1] !== '6' && p[1] !== '7') { g = curGrade(); } return getData(); }).then(function (d) { var nm = DB.user ? DB.user.name : 'Öğrenci (bu cihaz)'; $('rep').innerHTML = reportHtml(filterGrade(d, g), nm, { grade: g, links: true }) + (d.local ? '<p class="note">Bu rapor yalnızca bu cihazdaki ' + g + '. sınıf kayıtlarından hazırlandı.</p>' : ''); });
     } };
   };
   // ---------- hata defteri ----------
   X.routes.hata = function (p) {
-    if (p[1] === 'coz') return hataQuiz();
-    return { html: '<h1>📓 Hata Defterim</h1><p class="lead">Yanlış yaptığın veya boş bıraktığın sorular burada toplanır. Doğru çözünce defterden çıkar.</p><div id="hd">Yükleniyor…</div>', after: function () {
-      getData().then(function (d) {
+    var gp = p[1] === 'coz' ? +p[2] : +p[1], g = DB.user ? +DB.user.grade : (gp === 6 || gp === 7 ? gp : curGrade());
+    if (p[1] === 'coz') return hataQuiz(g);
+    return { html: '<h1>📓 Hata Defterim (' + g + '. sınıf)</h1>' + gradeTabs('#/hata', g) + '<p class="lead">Yanlış yaptığın veya boş bıraktığın sorular burada toplanır. Doğru çözünce defterden çıkar.</p><div id="hd">Yükleniyor…</div>', after: function () {
+      getData().then(function (d0) { var d = filterGrade(d0, g);
         var open = d.mistakes.filter(function (m) { return !m.solved; }), solved = d.mistakes.length - open.length, items = [];
         open.forEach(function (m) { var q = X.qFromKey(m.key); if (q) items.push({ m: m, q: q, w: q.week }); });
         var html = '<div class="vcards"><div class="vcard" style="--k:#d63031"><b>' + items.length + '</b><span>çözülmeyi bekliyor</span></div><div class="vcard" style="--k:#14a44d"><b>' + solved + '</b><span>çözüldü</span></div></div>';
         if (!items.length) { $('hd').innerHTML = html + '<p class="note">Hata defterin boş. Testleri çözdükçe yanlışların burada görünür.</p>'; return; }
-        html += '<p><a class="btn" href="#/hata/coz">▶ Hata defterinden test çöz (' + Math.min(20, items.length) + ' soru)</a></p>';
+        html += '<p><a class="btn" href="#/hata/coz/' + g + '">▶ Hata defterinden test çöz (' + Math.min(20, items.length) + ' soru)</a></p>';
         var byW = {}; items.forEach(function (it) { (byW[it.w] = byW[it.w] || []).push(it); });
         Object.keys(byW).forEach(function (wk) { html += '<h3>' + esc(weekLabel(wk)) + ' (' + byW[wk].length + ')</h3>' + byW[wk].map(function (it) { return '<details class="fold"><summary>' + it.q.q.replace(/<[^>]+>/g, ' ').slice(0, 110) + '…  <small class="note">(' + it.m.n + ' kez yanlış)</small></summary><div class="foldbody">' + it.q.q + (it.q.fig || '') + '<p><b>Doğru cevap:</b> ' + LET[it.q.ans] + ') ' + it.q.opts[it.q.ans] + '</p><p class="note">' + (it.q.exp || '') + '</p></div></details>'; }).join(''); });
         $('hd').innerHTML = html;
       });
     } };
   };
-  function hataQuiz() {
-    return { html: '<div class="crumbs"><a href="#/hata">Hata Defterim</a> › Test</div><h1>📓 Hata Defteri Testi</h1><div id="hq">Yükleniyor…</div>', after: function () {
-      getData().then(function (d) {
+  function hataQuiz(g) {
+    return { html: '<div class="crumbs"><a href="#/hata/' + g + '">Hata Defterim</a> › Test</div><h1>📓 Hata Defteri Testi (' + g + '. sınıf)</h1><div id="hq">Yükleniyor…</div>', after: function () {
+      getData().then(function (d0) { var d = filterGrade(d0, g);
         var items = []; d.mistakes.filter(function (m) { return !m.solved; }).forEach(function (m) { var q = X.qFromKey(m.key); if (q) items.push({ key: m.key, q: q, n: m.n }); });
         items.sort(function (a, b) { return b.n - a.n; }); items = items.slice(0, 20);
         if (!items.length) { $('hq').innerHTML = '<p>Çözülecek hata kalmadı! 🎉</p><a class="btn" href="#/">Konulara git</a>'; return; }
-        var html = '<div class="card" id="quiz">' + items.map(function (it, i) { return X.qHtml(it.q, i); }).join('') + '</div><div class="scorebar"><div id="sc" class="score">Cevapla: 0/' + items.length + '</div><div><button class="btn" id="finish">Bitir ve Kontrol Et</button> <button class="btn alt hidden" id="retry">Tekrar dene</button> <a class="btn alt hidden" id="nxt" href="#/hata">Hata defterine dön →</a></div></div>';
+        var html = '<div class="card" id="quiz">' + items.map(function (it, i) { return X.qHtml(it.q, i); }).join('') + '</div><div class="scorebar"><div id="sc" class="score">Cevapla: 0/' + items.length + '</div><div><button class="btn" id="finish">Bitir ve Kontrol Et</button> <button class="btn alt hidden" id="retry">Tekrar dene</button> <a class="btn alt hidden" id="nxt" href="#/hata/' + g + '">Hata defterine dön →</a></div></div>';
         $('hq').innerHTML = html;
         X.wireQuiz({ no: 'hata' }, 0, items.map(function (it) { return it.q; }), { kind: 'hata', ref: 'hata', src: function (i) { return items[i].key; } });
       });
@@ -222,9 +242,9 @@
     return { html: '<div class="crumbs"><a href="#/ogretmen">Öğretmen paneli</a> › Öğrenci raporu</div><div class="no-print tools"><button class="btn" id="prr">🖨️ Yazdır / PDF</button></div><article class="paper report" id="rep">Yükleniyor…</article>', after: function () {
       $('prr').onclick = function () { window.print(); };
       DB.ready.then(function () { return DB.t('GET', '/student/' + id); }).then(function (d) {
-        var html = reportHtml({ results: d.results, mistakes: d.mistakes }, d.student.name, { grade: d.student.grade });
+        var fd = filterGrade({ results: d.results, mistakes: d.mistakes, assignments: [] }, +d.student.grade), html = reportHtml({ results: fd.results, mistakes: fd.mistakes }, d.student.name, { grade: d.student.grade });
         html += '<h3>Ödevler</h3>' + (d.assignments.length ? '<div class="tblwrap"><table class="tbl"><thead><tr><th>Ödev</th><th>Son gün</th><th>Durum</th></tr></thead><tbody>' + d.assignments.map(function (a) { return '<tr><td>' + esc(a.title) + '</td><td>' + esc(a.due || '—') + '</td><td>' + (a.done ? '✅ ' + a.score + '/' + a.total : '⏳ bekliyor') + '</td></tr>'; }).join('') + '</tbody></table></div>' : '<p class="note">Ödev atanmamış.</p>');
-        var open = d.mistakes.filter(function (m) { return !m.solved; });
+        var open = fd.mistakes.filter(function (m) { return !m.solved; });
         html += '<h3>Açık hata defteri (' + open.length + ')</h3>' + (open.length ? '<ul>' + open.slice(0, 15).map(function (m) { var q = X.qFromKey(m.key); return q ? '<li>' + esc(weekLabel(q.week)) + ' — ' + esc(q.q.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 100)) + '… <b>(' + m.n + '×)</b></li>' : ''; }).join('') + '</ul>' : '<p class="note">Yok.</p>');
         $('rep').innerHTML = html;
       }).catch(function (e) { $('rep').innerHTML = '<p style="color:var(--bad)">' + esc(e.message) + '</p>'; });
