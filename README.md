@@ -1,11 +1,23 @@
-# 6. ve 7. Sınıf Matematik – Haftalık Ders Planı, Test ve Sınav
+# 6. ve 7. Sınıf Matematik
 
-Statik web uygulaması (derleme gerekmez). `index.html` dosyasını tarayıcıda açın veya `python3 -m http.server` ile sunun.
+Konu anlatımı, testler, oyunlar, sınav/çalışma kâğıtları, hata defteri, öğrenci raporu ve öğretmen paneli.
 
-- 6. sınıf: 6 tema, 29 haftalık konu; 7. sınıf: 6 ünite, 22 haftalık konu: konu anlatımı, çözümlü örnekler, etkinlikler
-- Her konu için 5 test (20'şer soru), Kahoot tarzı oyun, 10 soruluk yazdırılabilir sınav kâğıdı, her tema için 20 soruluk ünite sınavı
-- Sorular `js/tema*.js` içindeki üreticilerle oluşturulur; cevaplar otomatik hesaplanır
+## İki çalışma biçimi
+1. **Sadece statik site** (GitHub Pages vb.): `index.html` yeterli. Sonuçlar ve hata defteri tarayıcıda (bu cihazda) saklanır; öğrenci girişi/öğretmen paneli kapalıdır.
+2. **Sunucu ile (veri tabanlı):** `node server.js` (Node 22+, ek paket gerekmez). Statik dosyaları da sunar. Veriler `data/app.db` (SQLite) içinde tutulur.
 
-## Yayınlama (GitHub Pages)
-Settings → Pages → Source: **Deploy from a branch** → Branch: `claude/epic-goodall-bzgdgo` (veya `main`), klasör: `/ (root)` → Save.
-Adres: https://iskilicaslan61.github.io/math/
+### Sunucuyu başlatma
+```
+TEACHER_PASSWORD=sifreniz PORT=8080 node server.js
+```
+`TEACHER_PASSWORD` verilmezse ilk açılışta rastgele bir şifre üretilir ve **bir kez** konsola yazılır.
+Tarayıcıdan `http://localhost:8080` → üstte **Öğretmen** → şifre → öğrenci ekle (erişim kodu otomatik üretilir) → ödev ata.
+Öğrenci: **Öğrenci Girişi** → erişim kodu → ödevleri çözer, sonuçlar veri tabanına yazılır, **Raporum** ve **Hata Defterim** sayfalarını görür.
+
+### Siteyi GitHub Pages'te, sunucuyu ayrı yerde çalıştırmak
+`config.js` içindeki `window.APP_API` değerine sunucu adresini yazın (ör. `https://sunucum.example.com`).
+
+### Dikkat
+- Sunucu çocukların adını ve sonuçlarını saklar: HTTPS ile yayınlayın, ad yerine ilk ad/rumuz kullanın, veli/okul izni alın (KVKK).
+- `data/` klasörü kalıcı bir diskte olmalı ve yedeklenmelidir (`DATA_DIR` ile değiştirilebilir). Ücretsiz bulut servislerinin çoğunda disk silinebilir.
+- Erişim kodları gizli bilgidir; öğretmen panelinden yenilenebilir.

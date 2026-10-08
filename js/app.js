@@ -24,7 +24,7 @@
   function viewHome(g) {
     var TM = TEMAS.filter(function (t) { return gr(t) === g; }), WK = WEEKS.filter(function (w) { return gr(w) === g; });
     var totalHours = 0; TM.forEach(function (t) { totalHours += t.hours; });
-    var html = '<div class="gtabs"><a class="gt' + (g === 6 ? ' on' : '') + '" href="#/">6. Sınıf</a><a class="gt' + (g === 7 ? ' on' : '') + '" href="#/sinif7">7. Sınıf</a></div><section class="hero"><h1>' + g + '. Sınıf Matematik</h1><p>' + g + '. sınıf matematik müfredatına göre hafta hafta işleyeceğiniz dersin <b>konu anlatımı</b>, her konu için <b>5 test</b> ve <b>sınav kâğıdı</b>. Birimden birime (temadan temaya) ilerleyin.</p>' +
+    var html = '<div id="homebanner"></div><div class="gtabs"><a class="gt' + (g === 6 ? ' on' : '') + '" href="#/">6. Sınıf</a><a class="gt' + (g === 7 ? ' on' : '') + '" href="#/sinif7">7. Sınıf</a></div><section class="hero"><h1>' + g + '. Sınıf Matematik</h1><p>' + g + '. sınıf matematik müfredatına göre hafta hafta işleyeceğiniz dersin <b>konu anlatımı</b>, her konu için <b>5 test</b> ve <b>sınav kâğıdı</b>. Birimden birime (temadan temaya) ilerleyin.</p>' +
       '<div class="stats"><div class="stat"><b>' + TM.length + '</b><span>Ünite (Tema)</span></div><div class="stat"><b>' + WK.length + '</b><span>Haftalık konu</span></div><div class="stat"><b>' + WK.length * QZ.TEST_COUNT + '</b><span>Test</span></div><div class="stat"><b>' + (WK.length + TM.length) + '</b><span>Sınav kâğıdı</span></div><div class="stat"><b>' + totalHours + '</b><span>Ders saati</span></div></div></section>';
     html += '<p class="note">Haftalık plan, her hafta yaklaşık 5 ders saati varsayımıyla hazırlanmıştır; kendi yıllık planınıza göre kaydırabilirsiniz. Test soruları sayısal değerleriyle her test için farklı üretilir, aynı test her açılışta aynı sorularla gelir.</p>';
     TM.forEach(function (t) {
@@ -47,7 +47,7 @@
   function weekHead(w, tab) {
     var t = temaOf(w.tema);
     return crumbs(w) + '<div class="wk-head" ' + cssVar(t.color) + '><span class="pill">' + tn(t) + '. Tema • Hafta ' + wn(w) + ' • ' + w.hours + ' ders saati</span><h1>' + esc(w.title) + '</h1></div>' +
-      '<div class="tabs" ' + cssVar(t.color) + '><a class="tab' + (tab === 'ders' ? ' on' : '') + '" href="#/hafta/' + w.no + '">📖 Konu Anlatımı</a><a class="tab' + (tab === 'test' ? ' on' : '') + '" href="#/hafta/' + w.no + '/testler">✅ 5 Test</a><a class="tab' + (tab === 'oyun' ? ' on' : '') + '" href="#/hafta/' + w.no + '/oyun">🎮 Oyun</a><a class="tab' + (tab === 'sinav' ? ' on' : '') + '" href="#/hafta/' + w.no + '/sinav">📝 Sınav Kâğıdı</a></div>';
+      '<div class="tabs" ' + cssVar(t.color) + '><a class="tab' + (tab === 'ders' ? ' on' : '') + '" href="#/hafta/' + w.no + '">📖 Konu Anlatımı</a><a class="tab' + (tab === 'test' ? ' on' : '') + '" href="#/hafta/' + w.no + '/testler">✅ 5 Test</a><a class="tab' + (tab === 'oyun' ? ' on' : '') + '" href="#/hafta/' + w.no + '/oyun">🎮 Oyun</a><a class="tab' + (tab === 'sinav' ? ' on' : '') + '" href="#/hafta/' + w.no + '/sinav">📝 Sınav Kâğıdı</a><a class="tab' + (tab === 'calisma' ? ' on' : '') + '" href="#/hafta/' + w.no + '/calisma">🖨️ Çalışma Kâğıdı</a></div>';
   }
   function viewLesson(w) {
     var t = temaOf(w.tema), GW = WEEKS.filter(function (x) { return gr(x) === gr(w); }), i = GW.indexOf(w);
@@ -124,10 +124,10 @@
     var html = crumbs(w, 'Test ' + k) + '<div class="wk-head" ' + cssVar(t.color) + '><span class="pill">Hafta ' + wn(w) + ' • Test ' + k + '/' + QZ.TEST_COUNT + '</span><h1>' + esc(w.title) + '</h1></div><div class="card" ' + cssVar(t.color) + ' id="quiz">';
     qs.forEach(function (q, i) { html += qHtml(q, i); });
     html += '</div><div class="scorebar"><div id="sc" class="score">Cevapla: 0/' + qs.length + '</div><div><button class="btn" id="finish">Bitir ve Kontrol Et</button> <button class="btn alt hidden" id="retry">Tekrar dene</button> ' + (k < QZ.TEST_COUNT ? '<a class="btn alt hidden" id="nxt" href="#/hafta/' + w.no + '/test/' + (k + 1) + '">Sonraki test →</a>' : '<a class="btn alt hidden" id="nxt" href="#/hafta/' + w.no + '/sinav">Sınav kâğıdına geç →</a>') + '</div></div>';
-    return { html: html, after: function () { wireQuiz(w, k, qs); } };
+    return { html: html, after: function () { wireQuiz(w, k, qs, { kind: 'test', ref: w.no + ':' + k, src: function (i) { return 't|' + w.no + '|' + k + '|' + i; } }); } };
   }
-  function wireQuiz(w, k, qs) {
-    var root = document.getElementById('quiz'), done = false;
+  function wireQuiz(w, k, qs, meta) {
+    var root = document.getElementById('quiz'), done = false, t0 = Date.now();
     root.addEventListener('click', function (e) {
       var box = e.target.closest('.q'); if (!box || !(e.target.closest('.solve-btn') || e.target.closest('.qt') || e.target.closest('.qn'))) return;
       var i = +box.getAttribute('data-i');
@@ -143,10 +143,11 @@
     document.getElementById('finish').onclick = function () {
       if (done) return;
       if (answered() < qs.length && !confirm('Boş bıraktığın sorular var. Yine de bitirmek istiyor musun?')) return;
-      done = true; var score = 0;
+      done = true; var score = 0, wrongKeys = [], rightKeys = [], cs = '', ws = [];
       qs.forEach(function (q, i) {
         var box = root.querySelector('.q[data-i="' + i + '"]'), lis = box.querySelectorAll('li'), chosen = box.querySelector('input:checked');
         var c = chosen ? +chosen.value : -1, ex = box.querySelector('.exp');
+        var mk = meta && meta.src ? meta.src(i) : null; ws.push(q.week || 0); cs += c < 0 ? '-' : (c === q.ans ? '1' : '0'); if (mk) { if (c === q.ans) rightKeys.push(mk); else wrongKeys.push(mk); }
         lis[q.ans].classList.add('right');
         if (c === q.ans) score++; else if (c >= 0) lis[c].classList.add('wrong');
         [].forEach.call(box.querySelectorAll('input'), function (x) { x.disabled = true; });
@@ -155,6 +156,8 @@
       });
       document.getElementById('sc').innerHTML = 'Sonuç: <span style="color:var(--ok)">' + score + '</span>/' + qs.length + ' doğru';
       var prev = bestOf(w.no, k); if (prev === null || score > prev) save('best:' + w.no + ':' + k, score);
+      if (meta && window.DB) { DB.record({ kind: meta.kind, ref: meta.ref, score: score, total: qs.length, dur: Math.round((Date.now() - t0) / 1000), w: ws, c: cs, wrong: wrongKeys, right: rightKeys }).then(function (ok) { var s = document.getElementById('sc'); if (s) s.innerHTML += ' <small class="note">' + (DB.user ? (ok ? '✓ sonucun kaydedildi' : '⚠️ kaydedilemedi') : '✓ bu cihaza kaydedildi') + '</small>'; }); }
+      if (meta && meta.onFinish) meta.onFinish(score);
       document.getElementById('finish').classList.add('hidden');
       document.getElementById('retry').classList.remove('hidden'); document.getElementById('nxt').classList.remove('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -204,17 +207,17 @@
 
   // ---------------- Pekiştirme testleri ----------------
   function viewTemaTests(t) {
-    var html = '<div class="crumbs"><a href="' + homeHref(t) + '">Yıllık Plan</a> › ' + tn(t) + '. Tema: ' + esc(t.title) + ' › Pekiştirme</div><div class="wk-head" ' + cssVar(t.color) + '><span class="pill">' + tn(t) + '. Tema • Pekiştirme Testleri</span><h1>' + esc(t.title) + '</h1></div><p class="lead">Konuların hepsinden karışık ' + QZ.TEST_COUNT + ' pekiştirme testi. Her testte ' + QZ.TEST_SIZE + ' soru var.</p><div class="testlist" ' + cssVar(t.color) + '>';
-    for (var k = 1; k <= QZ.TEST_COUNT; k++) { var b = bestOf('p' + t.id, k); html += '<a class="tcard" href="#/tema/' + t.id + '/pekistirme/' + k + '"><span class="badge' + (b !== null && b >= QZ.TEST_SIZE - 2 ? ' good' : '') + '">' + (b === null ? 'Yeni' : 'En iyi ' + b + '/' + QZ.TEST_SIZE) + '</span><b>Pekiştirme ' + k + '</b><span>' + QZ.TEST_SIZE + ' soru • karışık</span></a>'; }
+    var html = '<div class="crumbs"><a href="' + homeHref(t) + '">Yıllık Plan</a> › ' + tn(t) + '. Tema: ' + esc(t.title) + ' › Pekiştirme</div><div class="wk-head" ' + cssVar(t.color) + '><span class="pill">' + tn(t) + '. Tema • Pekiştirme Testleri</span><h1>' + esc(t.title) + '</h1></div><p class="lead">Konuların hepsinden karışık ' + QZ.PEK_COUNT + ' pekiştirme testi. Her testte ' + QZ.TEST_SIZE + ' soru var.</p><div class="testlist" ' + cssVar(t.color) + '>';
+    for (var k = 1; k <= QZ.PEK_COUNT; k++) { var b = bestOf('p' + t.id, k); html += '<a class="tcard" href="#/tema/' + t.id + '/pekistirme/' + k + '"><span class="badge' + (b !== null && b >= QZ.TEST_SIZE - 2 ? ' good' : '') + '">' + (b === null ? 'Yeni' : 'En iyi ' + b + '/' + QZ.TEST_SIZE) + '</span><b>Pekiştirme ' + k + '</b><span>' + QZ.TEST_SIZE + ' soru • karışık</span></a>'; }
     return html + '</div>';
   }
   function viewTemaTest(t, k) {
     var qs = QZ.buildTemaTest(t.id, k), pw = { no: 'p' + t.id, tema: t.id };
-    var html = '<div class="crumbs"><a href="' + homeHref(t) + '">Yıllık Plan</a> › ' + tn(t) + '. Tema › <a href="#/tema/' + t.id + '/pekistirme">Pekiştirme</a> › Test ' + k + '</div><div class="wk-head" ' + cssVar(t.color) + '><span class="pill">' + tn(t) + '. Tema • Pekiştirme ' + k + '/' + QZ.TEST_COUNT + '</span><h1>' + esc(t.title) + '</h1></div><div class="card" ' + cssVar(t.color) + ' id="quiz">';
+    var html = '<div class="crumbs"><a href="' + homeHref(t) + '">Yıllık Plan</a> › ' + tn(t) + '. Tema › <a href="#/tema/' + t.id + '/pekistirme">Pekiştirme</a> › Test ' + k + '</div><div class="wk-head" ' + cssVar(t.color) + '><span class="pill">' + tn(t) + '. Tema • Pekiştirme ' + k + '/' + QZ.PEK_COUNT + '</span><h1>' + esc(t.title) + '</h1></div><div class="card" ' + cssVar(t.color) + ' id="quiz">';
     qs.forEach(function (q, i) { html += qHtml(q, i); });
-    var nxt = k < QZ.TEST_COUNT ? '<a class="btn alt hidden" id="nxt" href="#/tema/' + t.id + '/pekistirme/' + (k + 1) + '">Sonraki test →</a>' : '<a class="btn alt hidden" id="nxt" href="#/tema/' + t.id + '/sinav">Ünite sınavına geç →</a>';
+    var nxt = k < QZ.PEK_COUNT ? '<a class="btn alt hidden" id="nxt" href="#/tema/' + t.id + '/pekistirme/' + (k + 1) + '">Sonraki test →</a>' : '<a class="btn alt hidden" id="nxt" href="#/tema/' + t.id + '/sinav">Ünite sınavına geç →</a>';
     html += '</div><div class="scorebar"><div id="sc" class="score">Cevapla: 0/' + qs.length + '</div><div><button class="btn" id="finish">Bitir ve Kontrol Et</button> <button class="btn alt hidden" id="retry">Tekrar dene</button> ' + nxt + '</div></div>';
-    return { html: html, after: function () { wireQuiz(pw, k, qs); } };
+    return { html: html, after: function () { wireQuiz(pw, k, qs, { kind: 'pekistirme', ref: t.id + ':' + k, src: function (i) { return 'p|' + t.id + '|' + k + '|' + i; } }); } };
   }
 
   // ---------------- Sınav kâğıdı ----------------
@@ -232,7 +235,7 @@
     qs.forEach(function (q, i) { h += '<div class="keyexp"><b>' + (i + 1) + '.</b> ' + LET[q.ans] + ') ' + (q.exp || '') + '</div>'; });
     return h + '</div></article>';
   }
-  function wirePaper(qs, id) {
+  function wirePaper(qs, id, meta) {
     var pr = document.getElementById('pr'), tk = document.getElementById('tk'), key = document.getElementById('key');
     var t0 = Date.now(), done = false, tick;
     function fmt(s) { return (s < 600 ? '0' : '') + Math.floor(s / 60) + ':' + (s % 60 < 10 ? '0' : '') + (s % 60); }
@@ -250,18 +253,20 @@
       var blank = qs.filter(function (q, i) { return !document.querySelector('input[name="p' + i + '"]:checked'); }).length;
       if (blank && !confirm(blank + ' soruyu boş bıraktın. Yine de teslim edilsin mi?')) return;
       done = true; clearInterval(tick);
-      var ok = 0, bad = 0;
+      var ok = 0, bad = 0, wrongKeys = [], rightKeys = [], cs = '', ws = [];
       qs.forEach(function (q, i) {
         var box = document.querySelector('.pq[data-i="' + i + '"]'), labs = box.querySelectorAll('label.po'), ch = box.querySelector('input:checked');
         [].forEach.call(box.querySelectorAll('input'), function (x) { x.disabled = true; });
         labs[q.ans].classList.add('right');
         if (ch) { if (+ch.value === q.ans) ok++; else { bad++; labs[+ch.value].classList.add('wrong'); } }
+        var mk = meta && meta.src ? meta.src(i) : null; ws.push(q.week || 0); cs += !ch ? '-' : (+ch.value === q.ans ? '1' : '0'); if (mk) { if (ch && +ch.value === q.ans) rightKeys.push(mk); else wrongKeys.push(mk); }
       });
       var n = qs.length, score = Math.round(ok * 100 / n * 10) / 10, name = (document.getElementById('stname').value || '').trim() || 'Öğrenci';
       var res = document.getElementById('result');
       res.innerHTML = '<div class="rs-big">' + MC.num(score) + ' <small>/ 100</small></div><div><b>' + esc(name) + '</b><br>✅ ' + ok + ' doğru • ❌ ' + bad + ' yanlış • ⚪ ' + (n - ok - bad) + ' boş • ⏱ ' + fmt(Math.floor((Date.now() - t0) / 1000)) + '<br>' + (score >= 85 ? '🌟 Pekiyi!' : score >= 70 ? '👏 İyi' : score >= 50 ? '💪 Orta, tekrar çalış' : '📖 Konuyu tekrar et') + '</div>';
       res.classList.remove('hidden'); key.classList.remove('hidden'); tk.textContent = 'Cevap anahtarını gizle';
       var prev = load('exam:' + id, null); if (prev === null || score > prev) save('exam:' + id, score);
+      if (meta && window.DB) { DB.record({ kind: meta.kind, ref: meta.ref, score: ok, total: n, dur: Math.round((Date.now() - t0) / 1000), w: ws, c: cs, wrong: wrongKeys, right: rightKeys }).then(function (sv) { res.innerHTML += '<div class="note">' + (DB.user ? (sv ? '✓ sonucun kaydedildi' : '⚠️ kaydedilemedi') : '✓ bu cihaza kaydedildi') + '</div>'; }); }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
     var best = load('exam:' + id, null);
@@ -269,12 +274,12 @@
   }
   function viewExam(w) {
     var t = temaOf(w.tema), qs = QZ.buildExam(w);
-    return { html: weekHead(w, 'sinav') + paperHtml(gr(w) + '. Sınıf Matematik – ' + w.title, 'Hafta ' + wn(w) + ' • ' + QZ.EXAM_SIZE + ' soru • Süre: 40 dakika', qs, t.color), after: function () { wirePaper(qs, 'w' + w.no); } };
+    return { html: weekHead(w, 'sinav') + paperHtml(gr(w) + '. Sınıf Matematik – ' + w.title, 'Hafta ' + wn(w) + ' • ' + QZ.EXAM_SIZE + ' soru • Süre: 40 dakika', qs, t.color), after: function () { wirePaper(qs, 'w' + w.no, { kind: 'sinav', ref: String(w.no), src: function (i) { return 'e|' + w.no + '|0|' + i; } }); } };
   }
   function viewTemaExam(id) {
     var t = temaOf(id), qs = QZ.buildTemaExam(id);
     var html = '<div class="crumbs"><a href="' + homeHref(t) + '">Yıllık Plan</a> › ' + tn(t) + '. Tema Sınavı</div><div class="wk-head" ' + cssVar(t.color) + '><span class="pill">' + tn(t) + '. Tema • Ünite Sınavı</span><h1>' + esc(t.title) + '</h1></div>';
-    return { html: html + paperHtml(gr(t) + '. Sınıf Matematik – ' + tn(t) + '. Tema: ' + t.title, 'Ünite sınavı • ' + qs.length + ' soru • Süre: 40 dakika', qs, t.color), after: function () { wirePaper(qs, 't' + id); } };
+    return { html: html + paperHtml(gr(t) + '. Sınıf Matematik – ' + tn(t) + '. Tema: ' + t.title, 'Ünite sınavı • ' + qs.length + ' soru • Süre: 40 dakika', qs, t.color), after: function () { wirePaper(qs, 't' + id, { kind: 'tsinav', ref: String(id), src: function (i) { return 'x|' + id + '|0|' + i; } }); } };
   }
 
   function viewAbout() {
@@ -302,7 +307,7 @@
     gm.onchange = function () { var team = gm.value === 'team'; root.querySelector('#gnameRow').classList.toggle('hidden', team); root.querySelector('#gteamRow').classList.toggle('hidden', !team); };
     root.querySelector('#gstart').onclick = function () {
       var team = gm.value === 'team', n = team ? +root.querySelector('#gtc').value : 1, players = [];
-      for (var i = 0; i < n; i++) players.push({ name: team ? ['Kırmızı', 'Mavi', 'Sarı', 'Yeşil'][i] + ' Takım' : (root.querySelector('#gname').value.trim() || 'Oyuncu'), color: TILES[i].c, score: 0, streak: 0, ok: 0 });
+      for (var i = 0; i < n; i++) players.push({ name: team ? ['Kırmızı', 'Mavi', 'Sarı', 'Yeşil'][i] + ' Takım' : (root.querySelector('#gname').value.trim() || 'Oyuncu'), color: TILES[i].c, score: 0, streak: 0, ok: 0, log: [] });
       if (!team) save('game:name', players[0].name);
       gameRun(w, root, players, +root.querySelector('#gt').value, team);
     };
@@ -326,7 +331,7 @@
     function pick(j) {
       if (answered) return; answered = true; clearInterval(timer);
       var q = qs[i], p = players[cur], el = (Date.now() - start) / 1000, ok = j === q.ans, pts = 0;
-      if (ok) { p.streak++; p.ok++; pts = Math.round(1000 * (1 - Math.min(1, el / limit) / 2)) + 100 * Math.min(p.streak - 1, 5); p.score += pts; } else p.streak = 0;
+      p.log[i] = ok; if (ok) { p.streak++; p.ok++; pts = Math.round(1000 * (1 - Math.min(1, el / limit) / 2)) + 100 * Math.min(p.streak - 1, 5); p.score += pts; } else p.streak = 0;
       var tiles = root.querySelectorAll('.g-tile');
       [].forEach.call(tiles, function (b, k) { b.disabled = true; if (k !== q.ans) b.classList.add('dim'); else b.classList.add('right'); });
       var box = document.createElement('div'); box.className = 'g-fb ' + (ok ? 'ok' : 'no');
@@ -338,6 +343,7 @@
     function end() {
       var sorted = players.slice().sort(function (a, b) { return b.score - a.score; });
       if (!team) { var top = load('game:top:' + w.no, []); top.push({ n: players[0].name, s: players[0].score }); top.sort(function (a, b) { return b.s - a.s; }); save('game:top:' + w.no, top.slice(0, 5)); }
+      if (!team && window.DB) { DB.record({ kind: 'oyun', ref: w.no + ':kahoot', score: players[0].ok, total: qs.length, dur: 0, w: qs.map(function (q) { return q.week || 0; }), c: players[0].log.map(function (x) { return x ? '1' : '0'; }).join(''), wrong: qs.map(function (q, i) { return players[0].log[i] ? null : 'g|' + w.no + '|0|' + i; }).filter(Boolean), right: [] }); }
       var medals = ['🥇', '🥈', '🥉', '4.'];
       root.innerHTML = '<div class="g-panel g-end"><h2>🏁 Oyun bitti!</h2>' + (team ? '' : '<p class="g-big">' + players[0].score + ' puan</p><p>' + players[0].ok + '/' + qs.length + ' doğru ' + (players[0].ok >= 18 ? '— Harika! 🌟' : players[0].ok >= 14 ? '— Çok iyi! 👏' : players[0].ok >= 10 ? '— İyi, biraz daha çalış 💪' : '— Konuyu tekrar edelim 📖') + '</p>') +
         (team ? '<div class="g-podium">' + sorted.map(function (p, k) { return '<div class="g-pl" style="border-color:' + p.color + '"><span>' + medals[k] + '</span><b>' + esc(p.name) + '</b><span>' + p.score + ' puan • ' + p.ok + ' doğru</span></div>'; }).join('') + '</div>' : '') +
@@ -397,22 +403,31 @@
     else if (p[0] === 'sinif7') out = { html: viewHome(7) };
     else if (p[0] === 'hakkinda') out = { html: viewAbout() };
     else if (p[0] === 'tema' && p[2] === 'sinav' && temaOf(+p[1])) out = viewTemaExam(+p[1]);
-    else if (p[0] === 'tema' && p[2] === 'pekistirme' && temaOf(+p[1])) { var kk = +p[3]; out = (kk >= 1 && kk <= QZ.TEST_COUNT) ? viewTemaTest(temaOf(+p[1]), kk) : { html: viewTemaTests(temaOf(+p[1])) }; }
+    else if (p[0] === 'tema' && p[2] === 'pekistirme' && temaOf(+p[1])) { var kk = +p[3]; out = (kk >= 1 && kk <= QZ.PEK_COUNT) ? viewTemaTest(temaOf(+p[1]), kk) : { html: viewTemaTests(temaOf(+p[1])) }; }
     else if (p[0] === 'hafta' && weekOf(+p[1])) {
       var w = weekOf(+p[1]);
       if (!p[2]) out = viewLesson(w);
       else if (p[2] === 'testler') out = { html: viewTests(w) };
       else if (p[2] === 'test') { var k = +p[3]; out = (k >= 1 && k <= QZ.TEST_COUNT) ? viewTest(w, k) : { html: viewTests(w) }; }
-      else if (p[2] === 'oyun') out = viewGame(w);
+      else if (p[2] === 'oyun') out = (p[3] === 'kahoot' || !window.APPX || !APPX.gameMenu) ? viewGame(w) : (p[3] && APPX.games[p[3]] ? APPX.games[p[3]](w) : APPX.gameMenu(w));
+      else if (p[2] === 'calisma' && window.APPX && APPX.worksheet) out = APPX.worksheet(w);
       else if (p[2] === 'sinav') out = viewExam(w);
       else out = viewLesson(w);
-    } else out = { html: '<h1>Sayfa bulunamadı</h1><p><a href="#/">Ana sayfaya dön</a></p>' };
+    } else if (window.APPX && APPX.routes[p[0]]) out = APPX.routes[p[0]](p);
+    else out = { html: '<h1>Sayfa bulunamadı</h1><p><a href="#/">Ana sayfaya dön</a></p>' };
     var pg = document.getElementById('prog'); if (pg) pg.remove(); window.onscroll = null;
     app.innerHTML = out.html;
     hydrate();
     if (out.after) out.after();
+    if (window.APPX && APPX.after) APPX.after(p);
     document.title = 'Matematik' + (p[0] === 'hafta' && weekOf(+p[1]) ? ' ' + gr(weekOf(+p[1])) + '. Sınıf – ' + weekOf(+p[1]).title : p[0] === 'sinif7' ? ' 7. Sınıf' : ' 6. Sınıf');
   }
+  function qFromKey(key) {
+    var p = String(key).split('|'), s = p[0], id = +p[1], k = +p[2], i = +p[3], w = weekOf(id), t = temaOf(id), arr = null;
+    try { if (s === 't' && w) arr = QZ.buildTest(w, k); else if (s === 'p' && t) arr = QZ.buildTemaTest(id, k); else if (s === 'e' && w) arr = QZ.buildExam(w); else if (s === 'x' && t) arr = QZ.buildTemaExam(id); else if (s === 'g' && w) arr = QZ.buildGame(w); else if (s === 'm' && w) arr = QZ.buildMini(w, 4); } catch (e) { }
+    return arr && arr[i] || null;
+  }
+  window.APPX = { routes: {}, games: {}, after: null, esc: esc, cssVar: cssVar, weekHead: weekHead, crumbs: crumbs, qHtml: qHtml, wireQuiz: wireQuiz, temaOf: temaOf, weekOf: weekOf, load: load, save: save, openPad: openPad, confetti: confetti, homeHref: homeHref, tn: tn, wn: wn, gr: gr, qFromKey: qFromKey, route: route, bestOf: bestOf, LET: LET, secIcon: secIcon, paperHtml: paperHtml };
   window.addEventListener('hashchange', function () { route(); window.scrollTo(0, 0); });
   route();
 })();

@@ -1,7 +1,7 @@
 /* Test ve sınav kâğıdı üretimi (tohumlu: her açılışta aynı sorular) */
 (function (global) {
   'use strict';
-  var TEST_COUNT = 5, TEST_SIZE = 20, EXAM_SIZE = 10, TEMA_EXAM_SIZE = 20;
+  var TEST_COUNT = 5, PEK_COUNT = 10, TEST_SIZE = 20, EXAM_SIZE = 10, TEMA_EXAM_SIZE = 20;
 
   function build(week, seed, count) {
     var rng = MC.makeRng(seed);
@@ -43,5 +43,5 @@
     var rng = MC.makeRng('tema' + temaId + '-mix');
     return rng.shuffle(all).slice(0, TEMA_EXAM_SIZE);
   }
-  global.QZ = { buildTest: buildTest, buildExam: buildExam, buildGame: buildGame, buildTemaTest: buildTemaTest, buildMini: buildMini, buildTemaExam: buildTemaExam, TEST_COUNT: TEST_COUNT, TEST_SIZE: TEST_SIZE, EXAM_SIZE: EXAM_SIZE, TEMA_EXAM_SIZE: TEMA_EXAM_SIZE };
+  global.QZ = { buildTest: buildTest, buildExam: buildExam, buildGame: buildGame, buildTemaTest: buildTemaTest, buildMini: buildMini, buildTemaExam: buildTemaExam, TEST_COUNT: TEST_COUNT, PEK_COUNT: PEK_COUNT, TEST_SIZE: TEST_SIZE, EXAM_SIZE: EXAM_SIZE, TEMA_EXAM_SIZE: TEMA_EXAM_SIZE };
 })(window);
