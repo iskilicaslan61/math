@@ -20,6 +20,7 @@
   }
   function hrefFor(kind, ref) {
     var p = String(ref).split(':');
+    if (kind === 'week') return '#/hafta/' + p[0] + '/testler';
     if (kind === 'test') return '#/hafta/' + p[0] + '/test/' + p[1];
     if (kind === 'pekistirme') return '#/tema/' + p[0] + '/pekistirme/' + p[1];
     if (kind === 'sinav') return '#/hafta/' + p[0] + '/sinav';
@@ -100,7 +101,9 @@
   function nav() {
     var n = $('navx'); if (!n) return;
     var h = '';
-    if (DB.user) h += '<a href="#/ogrenci">👤 ' + esc(DB.user.name) + '</a><a href="#/rapor">Raporum</a><a href="#/hata">Hata Defterim</a><a href="#" id="lgo">Çıkış</a>';
+    document.body.classList.toggle('student-mode', !!DB.user);
+    var brand = document.querySelector('.brand'); if (brand) brand.href = DB.user ? '#/ogrenci' : '#/';
+    if (DB.user) h += '<a href="#/ogrenci">👤 ' + esc(DB.user.name) + '</a><a href="#/rapor">Raporum</a><a href="#" id="lgo">Çıkış</a>';
     else h += '<a href="#/rapor">Raporum</a><a href="#/hata">Hata Defterim</a>' + (DB.server ? '<a href="#/giris">Öğrenci Girişi</a><a href="#/ogretmen">Öğretmen</a>' : '');
     n.innerHTML = h;
     var l = $('lgo'); if (l) l.onclick = function (e) { e.preventDefault(); DB.logout(); nav(); go('#/'); };
@@ -128,12 +131,29 @@
     return { html: '<h1>👤 Panelim</h1><div id="dash">Yükleniyor…</div>', after: function () {
       getData().then(function (d) {
         if (!DB.user) { $('dash').innerHTML = '<p>Giriş yapılmamış. <a class="btn" href="#/giris">Öğrenci girişi</a></p>'; return; }
-        var pend = d.assignments.filter(function (a) { return !a.done; }), done = d.assignments.filter(function (a) { return a.done; });
-        var html = '<p class="lead">Merhaba <b>' + esc(DB.user.name) + '</b> (' + DB.user.grade + '. sınıf). Öğretmenin sana ödev verdiyse aşağıda görürsün.</p>';
-        html += '<h2>📌 Bekleyen ödevlerim (' + pend.length + ')</h2>' + (pend.length ? '<div class="assign">' + pend.map(function (a) { return '<a class="asg" href="' + hrefFor(a.kind, a.ref) + '"><b>' + esc(a.title) + '</b><span>' + (KIND[a.kind] || '') + (a.due ? ' • son gün ' + esc(a.due) : '') + '</span><em>Başla →</em></a>'; }).join('') + '</div>' : '<p class="note">Bekleyen ödev yok. 🎉</p>');
-        html += '<h2>✅ Tamamlananlar (' + done.length + ')</h2>' + (done.length ? '<div class="assign">' + done.slice(0, 8).map(function (a) { return '<div class="asg ok"><b>' + esc(a.title) + '</b><span>Sonuç: ' + a.score + '/' + a.total + ' (%' + pct(a.score, a.total) + ')</span></div>'; }).join('') + '</div>' : '<p class="note">Henüz yok.</p>');
-        html += '<p><a class="btn" href="#/rapor">📋 Raporum</a> <a class="btn alt" href="#/hata">📓 Hata Defterim</a> <a class="btn alt" href="#/">Konulara git</a></p>';
+        var weeks = d.assignments.filter(function (a) { return a.kind === 'week'; });
+        var legacy = d.assignments.filter(function (a) { return a.kind !== 'week'; });
+        var html = '<div class="student-welcome"><p class="lead">Merhaba <b>' + esc(DB.user.name) + '</b>, haftalık çalışmaların burada.</p><p class="note">Öğretmenin haftayı açınca konu ve testler görünür. Haftanın 10 testini tamamladıktan sonra çalışmanı öğretmenine gönder.</p></div>';
+        html += '<h2>📚 Açık haftalar</h2>' + (weeks.filter(function (a) { return !a.done; }).length ? '<div class="assign">' + weeks.filter(function (a) { return !a.done; }).map(function (a) {
+          var complete = a.completedTests || 0, required = a.requiredTests || 10, ready = complete >= required;
+          return '<section class="week-assignment' + (ready ? ' ready' : '') + '"><div class="week-assignment-head"><div><span class="week-assignment-kicker">HAFTALIK ÇALIŞMA</span><h3>' + esc(a.title) + '</h3></div><span class="week-assignment-count">' + complete + '<span>/' + required + '</span></span></div><p class="week-assignment-meta">' + (a.due ? 'Son gün ' + esc(a.due) : 'Teslim tarihi belirtilmedi') + ' · 20 soru / test</p><div class="access-progress" role="progressbar" aria-label="Tamamlanan testler" aria-valuemin="0" aria-valuemax="' + required + '" aria-valuenow="' + complete + '"><i style="width:' + Math.min(100, complete * 100 / required) + '%"></i></div><div class="week-assignment-actions">' + (ready ? '<button type="button" class="btn" data-submitweek="' + esc(a.ref) + '">Öğretmene gönder</button><span class="week-ready-note">10 test tamamlandı</span>' : '<a class="btn" href="' + hrefFor('week', a.ref) + '">' + (complete ? 'Devam et' : 'Haftaya başla') + '</a><span class="week-assignment-meta">' + (required - complete) + ' test kaldı</span>') + '</div><p class="week-submit-msg" id="submitmsg-' + esc(a.ref) + '" aria-live="polite"></p></section>';
+        }).join('') + '</div>' : '<div class="access-empty"><b>Şu an açık haftan yok.</b><span>Öğretmenin yeni bir hafta atadığında burada görünür.</span></div>');
+        var done = weeks.filter(function (a) { return a.done; });
+        html += '<h2>✅ Öğretmene gönderilenler (' + done.length + ')</h2>' + (done.length ? '<div class="submitted-weeks">' + done.map(function (a) { return '<div class="submitted-week"><span class="submitted-check" aria-hidden="true">✓</span><span><b>' + esc(a.title) + '</b><small>' + (a.submittedAt ? 'Gönderildi ' + dt(a.submittedAt) : 'Gönderildi') + '</small></span><span class="submitted-score">' + (a.score != null ? a.score + '/' + a.total : 'Teslim edildi') + '</span></div>'; }).join('') + '</div>' : '<p class="note">Henüz gönderilen hafta yok.</p>');
+        var pend = legacy.filter(function (a) { return !a.done; });
+        if (pend.length) html += '<h2>📌 Diğer ödevler</h2><div class="assign">' + pend.map(function (a) { return '<a class="asg" href="' + hrefFor(a.kind, a.ref) + '"><b>' + esc(a.title) + '</b><span>' + (KIND[a.kind] || '') + (a.due ? ' • son gün ' + esc(a.due) : '') + '</span><em>Başla →</em></a>'; }).join('') + '</div>';
+        html += '<p><a class="btn alt" href="#/rapor">📋 Raporum</a></p>';
         $('dash').innerHTML = html;
+        $('dash').onclick = function (e) {
+          var submit = e.target.closest('[data-submitweek]');
+          if (!submit) return;
+          var week = submit.getAttribute('data-submitweek');
+          submit.disabled = true; submit.textContent = 'Gönderiliyor…';
+          DB.submitWeek(+week).then(function () { X.route(); }).catch(function (err) {
+            var msg = $('submitmsg-' + week); if (msg) msg.textContent = err.message;
+            submit.disabled = false; submit.textContent = 'Öğretmene gönder';
+          });
+        };
       });
     } };
   };
@@ -208,7 +228,8 @@
     var h = '<p><button class="btn sm alt" id="tout">Çıkış</button> <button class="btn sm alt" id="tcards">🖨️ Erişim kartlarını yazdır</button></p>';
     h += '<div class="card"><div class="sec-pad"><h3>➕ Öğrenci ekle</h3><div class="login"><input id="sn" maxlength="40" placeholder="Ad (soyad ilk harfi yeterli)"><select id="sg"><option value="6">6. sınıf</option><option value="7">7. sınıf</option></select><button class="btn" id="sadd">Ekle</button></div><p id="snew" class="note"></p></div></div>';
     h += '<div class="card"><div class="sec-pad"><h3>👥 Öğrenciler (' + students.length + ')</h3>' + (students.length ? '<div class="tblwrap"><table class="tbl"><thead><tr><th><input type="checkbox" id="selall"></th><th>Ad</th><th>Sınıf</th><th>Erişim kodu</th><th>Son giriş</th><th>Çözülen</th><th>Ortalama</th><th>Açık hata</th><th></th></tr></thead><tbody>' + students.map(function (s) { return '<tr><td><input type="checkbox" class="sel" value="' + s.id + '"></td><td>' + esc(s.name) + '</td><td>' + s.grade + '</td><td><code class="codebox">' + esc(s.code) + '</code></td><td>' + dt(s.last) + '</td><td>' + s.results + '</td><td>' + (s.results ? '%' + s.avg : '—') + '</td><td>' + s.mistakes + '</td><td><a class="btn sm" href="#/ogretmen/ogrenci/' + s.id + '">Rapor</a> <button class="btn sm alt" data-nc="' + s.id + '">Yeni kod</button> <button class="btn sm alt" data-del="' + s.id + '">Sil</button></td></tr>'; }).join('') + '</tbody></table></div>' : '<p class="note">Henüz öğrenci yok. Yukarıdan ekleyin; her öğrenciye otomatik bir erişim kodu verilir.</p>') + '</div></div>';
-    h += '<div class="card"><div class="sec-pad"><h3>📤 Ödev ata</h3><p class="note">Tablodan öğrencileri işaretleyin (ya da sınıfa toplu atayın).</p><div class="asgform"><label>Tür <select id="ak"><option value="test">Hafta testi</option><option value="pekistirme">Pekiştirme testi</option><option value="sinav">Hafta sınavı</option><option value="tsinav">Ünite sınavı</option><option value="hata">Hata defteri çözümü</option></select></label><label id="aw1">Konu <select id="aw">' + weekOptions() + '</select></label><label id="at1" class="hidden">Ünite <select id="at">' + temaOptions() + '</select></label><label id="an1">Test no <select id="an"></select></label><label>Son gün <input type="date" id="ad"></label></div><p><button class="btn" id="asel">Seçili öğrencilere ata</button> <button class="btn alt" id="a6">Tüm 6. sınıflara</button> <button class="btn alt" id="a7">Tüm 7. sınıflara</button></p><p id="amsg" class="note"></p></div></div>';
+    h += '<div class="card weekly-access-admin"><div class="sec-pad"><div class="access-admin-heading"><div><h3>Haftalık erişim</h3><p class="note">Bir hafta açın. Öğrenci yalnızca o haftanın konu anlatımını ve 10 testini görür; tamamlayınca çalışmasını size gönderir.</p></div><span class="access-admin-icon" aria-hidden="true">↗</span></div><div class="asgform"><label>Açılacak hafta <select id="waweek">' + weekOptions() + '</select></label><label>Son teslim tarihi <input type="date" id="wadue"></label></div><p class="access-admin-actions"><button class="btn" id="wasel">Seçili öğrencilere hafta aç</button> <button class="btn alt" id="wa6">Tüm 6. sınıfa aç</button> <button class="btn alt" id="wa7">Tüm 7. sınıfa aç</button></p><p id="wamess" class="note" aria-live="polite"></p></div></div>';
+    h += '<details class="legacy-assign"><summary>Tekil test veya başka ödev ata</summary><div class="card"><div class="sec-pad"><h3>📤 Ödev ata</h3><p class="note">Tablodan öğrencileri işaretleyin (ya da sınıfa toplu atayın).</p><div class="asgform"><label>Tür <select id="ak"><option value="test">Hafta testi</option><option value="pekistirme">Pekiştirme testi</option><option value="sinav">Hafta sınavı</option><option value="tsinav">Ünite sınavı</option><option value="hata">Hata defteri çözümü</option></select></label><label id="aw1">Konu <select id="aw">' + weekOptions() + '</select></label><label id="at1" class="hidden">Ünite <select id="at">' + temaOptions() + '</select></label><label id="an1">Test no <select id="an"></select></label><label>Son gün <input type="date" id="ad"></label></div><p><button class="btn" id="asel">Seçili öğrencilere ata</button> <button class="btn alt" id="a6">Tüm 6. sınıflara</button> <button class="btn alt" id="a7">Tüm 7. sınıflara</button></p><p id="amsg" class="note"></p></div></div></details>';
     root.innerHTML = h;
     $('tout').onclick = function () { DB.tLogout(); renderTeacher(); };
     $('sadd').onclick = function () { var nm = $('sn').value.trim(); if (!nm) return; DB.t('POST', '/students', { name: nm, grade: +$('sg').value }).then(function (r) { renderTeacher(); setTimeout(function () { var m = $('snew'); if (m) m.innerHTML = '✅ <b>' + esc(r.name) + '</b> eklendi. Erişim kodu: <code class="codebox">' + esc(r.code) + '</code>'; }, 300); }).catch(function (e) { $('snew').textContent = e.message; }); };
@@ -218,6 +239,20 @@
       if (nc) DB.t('POST', '/students/' + nc + '/code').then(renderTeacher);
       if (del && confirm('Bu öğrenci ve tüm kayıtları silinsin mi?')) DB.t('DELETE', '/students/' + del).then(renderTeacher);
     };
+    function grantWeek(target) {
+      var week = $('waweek').value, weekInfo = X.weekOf(+week), title = weekInfo ? weekLabel(week) : ('Hafta ' + week);
+      if (target.grade && weekInfo && X.gr(weekInfo) !== target.grade) {
+        $('wamess').textContent = 'Seçili hafta ' + X.gr(weekInfo) + '. sınıfa ait. ' + target.grade + '. sınıfa uygun bir hafta seç.';
+        return;
+      }
+      target.week = +week; target.title = title; target.due = $('wadue').value || '';
+      DB.t('POST', '/assign-week', target).then(function (r) {
+        $('wamess').textContent = '✓ ' + r.count + ' öğrenciye ' + title + ' erişimi açıldı.';
+      }).catch(function (e) { $('wamess').textContent = 'Erişim açılamadı: ' + e.message; });
+    }
+    $('wasel').onclick = function () { grantWeek({ student_ids: [].map.call(document.querySelectorAll('.sel:checked'), function (c) { return +c.value; }) }); };
+    $('wa6').onclick = function () { grantWeek({ grade: 6 }); };
+    $('wa7').onclick = function () { grantWeek({ grade: 7 }); };
     function syncForm() { var k = $('ak').value, isW = k === 'test' || k === 'sinav', isT = k === 'pekistirme' || k === 'tsinav', hasN = k === 'test' || k === 'pekistirme'; $('aw1').classList.toggle('hidden', !isW); $('at1').classList.toggle('hidden', !isT); $('an1').classList.toggle('hidden', !hasN); var cnt = k === 'test' ? QZ.TEST_COUNT : QZ.PEK_COUNT; $('an').innerHTML = Array.apply(null, Array(cnt)).map(function (_, i) { return '<option>' + (i + 1) + '</option>'; }).join(''); }
     $('ak').onchange = syncForm; syncForm();
     function assign(body) {
@@ -243,12 +278,26 @@
       $('prr').onclick = function () { window.print(); };
       DB.ready.then(function () { return DB.t('GET', '/student/' + id); }).then(function (d) {
         var fd = filterGrade({ results: d.results, mistakes: d.mistakes, assignments: [] }, +d.student.grade), html = reportHtml({ results: fd.results, mistakes: fd.mistakes }, d.student.name, { grade: d.student.grade });
-        html += '<h3>Ödevler</h3>' + (d.assignments.length ? '<div class="tblwrap"><table class="tbl"><thead><tr><th>Ödev</th><th>Son gün</th><th>Durum</th></tr></thead><tbody>' + d.assignments.map(function (a) { return '<tr><td>' + esc(a.title) + '</td><td>' + esc(a.due || '—') + '</td><td>' + (a.done ? '✅ ' + a.score + '/' + a.total : '⏳ bekliyor') + '</td></tr>'; }).join('') + '</tbody></table></div>' : '<p class="note">Ödev atanmamış.</p>');
+        html += '<h3>Hafta erişimleri ve ödevler</h3>' + (d.assignments.length ? '<div class="tblwrap"><table class="tbl"><thead><tr><th>Ödev / hafta</th><th>Son gün</th><th>İlerleme</th><th>Durum</th></tr></thead><tbody>' + d.assignments.map(function (a) {
+          var progress = a.kind === 'week' ? (a.completedTests || 0) + '/' + (a.requiredTests || 10) + ' test' : (a.done ? a.score + '/' + a.total : '—');
+          var status = a.kind === 'week' ? (a.submitted ? '✓ Öğretmene gönderildi' : 'Açık · ' + (a.completedTests || 0) + '/10 test') : (a.done ? '✓ Tamamlandı' : 'Açık');
+          return '<tr><td>' + esc(a.title) + '</td><td>' + esc(a.due || '—') + '</td><td>' + progress + '</td><td>' + status + (a.kind === 'week' ? ' <button type="button" class="btn sm alt" data-revoke-week="' + a.id + '">Erişimi kaldır</button>' : '') + '</td></tr>';
+        }).join('') + '</tbody></table></div>' : '<p class="note">Henüz hafta erişimi veya ödev atanmamış.</p>');
         var open = fd.mistakes.filter(function (m) { return !m.solved; });
         html += '<h3>Açık hata defteri (' + open.length + ')</h3>' + (open.length ? '<ul>' + open.slice(0, 15).map(function (m) { var q = X.qFromKey(m.key); return q ? '<li>' + esc(weekLabel(q.week)) + ' — ' + esc(q.q.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 100)) + '… <b>(' + m.n + '×)</b></li>' : ''; }).join('') + '</ul>' : '<p class="note">Yok.</p>');
         $('rep').innerHTML = html;
+        $('rep').onclick = function (e) {
+          var revoke = e.target.closest('[data-revoke-week]');
+          if (!revoke || !confirm('Bu haftanın erişimini kaldır? Kayıtlı test sonuçları korunur.')) return;
+          revoke.disabled = true;
+          DB.t('DELETE', '/assignments/' + revoke.getAttribute('data-revoke-week')).then(function () { X.route(); }).catch(function (err) {
+            revoke.disabled = false;
+            revoke.textContent = 'Hata: ' + err.message;
+          });
+        };
       }).catch(function (e) { $('rep').innerHTML = '<p style="color:var(--bad)">' + esc(e.message) + '</p>'; });
     } };
   }
   X.route();
+  DB.ready.then(X.route);
 })();

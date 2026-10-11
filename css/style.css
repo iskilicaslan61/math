@@ -420,3 +420,51 @@ body.pad-open { overflow: hidden; }
 .paper .vcard span { color: #555 !important; } .paper .vcard b { color: var(--k) !important; }
 .paper .ws-box { background: #fff; color: #111; }
 .paper .box::before { display: none !important; }
+
+/* Haftalık öğrenci erişimi */
+.student-mode .topnav > a { display: none; }
+.student-mode .topnav { justify-content: flex-end; }
+.access-lock { max-width: 620px; margin: clamp(36px, 10vh, 100px) auto; padding: 30px; text-align: center; background: var(--card); border: 1px solid var(--line); border-radius: 16px; }
+.access-lock-icon { display: grid; place-items: center; width: 54px; height: 54px; margin: 0 auto 14px; border-radius: 50%; background: #eef2ff; font-size: 24px; }
+.access-lock h1 { margin-top: 0; }
+.access-lock p { max-width: 48ch; margin: 0 auto 20px; color: var(--muted); }
+.access-error { padding: 16px; color: var(--bad); }
+.student-welcome { margin: 0 0 26px; }
+.student-welcome .lead { margin-bottom: 2px; color: var(--ink); font-size: 20px; }
+.student-welcome .note { margin-top: 2px; }
+.week-assignment { min-width: 0; padding: 18px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
+.week-assignment.ready { border-color: var(--ok); }
+.week-assignment-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.week-assignment-kicker { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .06em; }
+.week-assignment h3 { margin: 4px 0; }
+.week-assignment-count { flex: none; color: var(--brand); font-size: 24px; font-weight: 800; line-height: 1.1; }
+.week-assignment-count span { color: var(--muted); font-size: 15px; font-weight: 600; }
+.week-assignment-meta { color: var(--muted); font-size: 13px; }
+.access-progress { height: 8px; margin: 14px 0; overflow: hidden; background: var(--line); border-radius: 99px; }
+.access-progress i { display: block; height: 100%; background: var(--brand); border-radius: inherit; }
+.week-assignment.ready .access-progress i { background: var(--ok); }
+.week-assignment-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.week-ready-note { color: var(--ok); font-size: 13px; font-weight: 700; }
+.week-submit-msg { color: var(--bad); font-size: 13px; }
+.access-empty { display: flex; flex-direction: column; gap: 4px; padding: 18px; background: #f6f7fb; border-radius: 12px; }
+.access-empty span, .submitted-week small { color: var(--muted); font-size: 13px; }
+.submitted-weeks { display: grid; gap: 8px; }
+.submitted-week { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+.submitted-week > span:nth-child(2) { display: flex; flex: 1; flex-direction: column; }
+.submitted-check { display: grid; place-items: center; width: 30px; height: 30px; flex: none; color: #fff; background: var(--ok); border-radius: 50%; font-weight: 700; }
+.submitted-score { color: var(--muted); font-size: 13px; white-space: nowrap; }
+.weekly-access-admin { border-color: color-mix(in srgb, var(--brand) 35%, var(--line)); }
+.access-admin-heading { display: flex; justify-content: space-between; gap: 16px; }
+.access-admin-heading h3 { margin-top: 0; }
+.access-admin-heading p { max-width: 65ch; }
+.access-admin-icon { display: grid; place-items: center; width: 38px; height: 38px; flex: none; color: var(--brand); background: #eef2ff; border-radius: 10px; font-size: 22px; font-weight: 700; }
+.access-admin-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.legacy-assign { margin: 18px 0; }
+.legacy-assign summary { width: fit-content; padding: 8px 0; color: var(--muted); cursor: pointer; font-weight: 600; }
+.legacy-assign .card { margin-top: 10px; }
+@media (max-width: 600px) {
+  .access-lock { margin: 30px 0; padding: 22px 16px; }
+  .week-assignment { padding: 14px; }
+  .submitted-week { align-items: flex-start; }
+  .weekly-access-admin .asgform label { width: 100%; }
+}

@@ -33,6 +33,13 @@
     (res.right || []).forEach(function (k) { if (ms[k]) { ms[k].solved = true; ms[k].t = Date.now(); } }); lset('mistakes', ms);
     return Promise.resolve(true);
   };
+  D.submitWeek = function (week) {
+    if (!D.user) return Promise.reject(new Error('Öğrenci girişi gerekli.'));
+    return req('POST', '/api/week/submit', { week: week }, ls('tok', null)).then(function (r) {
+      if (!r.ok) throw new Error(r.data.error || 'Hafta gönderilemedi.');
+      return r.data;
+    });
+  };
   // ---- öğretmen ----
   D.tTok = function () { return ss('ttok'); };
   D.tLogin = function (pw) { return req('POST', '/api/t/login', { password: pw }).then(function (r) { if (!r.ok) throw new Error(r.data.error || 'Giriş başarısız'); ss('ttok', r.data.token); }); };

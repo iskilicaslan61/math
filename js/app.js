@@ -42,12 +42,13 @@
   // ---------------- Hafta sayfası ----------------
   function crumbs(w, extra) {
     var t = temaOf(w.tema);
-    return '<div class="crumbs"><a href="' + homeHref(w) + '">Yıllık Plan</a> › ' + tn(t) + '. Tema: ' + esc(t.title) + ' › <a href="#/hafta/' + w.no + '">Hafta ' + wn(w) + '</a>' + (extra ? ' › ' + extra : '') + '</div>';
+    return '<div class="crumbs"><a href="' + (DB.user ? '#/ogrenci' : homeHref(w)) + '">' + (DB.user ? 'Panelim' : 'Yıllık Plan') + '</a> › ' + tn(t) + '. Tema: ' + esc(t.title) + ' › <a href="#/hafta/' + w.no + '">Hafta ' + wn(w) + '</a>' + (extra ? ' › ' + extra : '') + '</div>';
   }
   function weekHead(w, tab) {
     var t = temaOf(w.tema);
+    var student = window.DB && DB.user;
     return crumbs(w) + '<div class="wk-head" ' + cssVar(t.color) + '><span class="pill">' + tn(t) + '. Tema • Hafta ' + wn(w) + ' • ' + w.hours + ' ders saati</span><h1>' + esc(w.title) + '</h1></div>' +
-      '<div class="tabs" ' + cssVar(t.color) + '><a class="tab' + (tab === 'ders' ? ' on' : '') + '" href="#/hafta/' + w.no + '">📖 Konu Anlatımı</a><a class="tab' + (tab === 'test' ? ' on' : '') + '" href="#/hafta/' + w.no + '/testler">✅ 10 Test</a><a class="tab' + (tab === 'oyun' ? ' on' : '') + '" href="#/hafta/' + w.no + '/oyun">🎮 Oyun</a><a class="tab' + (tab === 'sinav' ? ' on' : '') + '" href="#/hafta/' + w.no + '/sinav">📝 Sınav Kâğıdı</a><a class="tab' + (tab === 'calisma' ? ' on' : '') + '" href="#/hafta/' + w.no + '/calisma">🖨️ Çalışma Kâğıdı</a></div>';
+      '<div class="tabs" ' + cssVar(t.color) + '><a class="tab' + (tab === 'ders' ? ' on' : '') + '" href="#/hafta/' + w.no + '">📖 Konu Anlatımı</a><a class="tab' + (tab === 'test' ? ' on' : '') + '" href="#/hafta/' + w.no + '/testler">✅ 10 Test</a>' + (student ? '' : '<a class="tab' + (tab === 'oyun' ? ' on' : '') + '" href="#/hafta/' + w.no + '/oyun">🎮 Oyun</a><a class="tab' + (tab === 'sinav' ? ' on' : '') + '" href="#/hafta/' + w.no + '/sinav">📝 Sınav Kâğıdı</a><a class="tab' + (tab === 'calisma' ? ' on' : '') + '" href="#/hafta/' + w.no + '/calisma">🖨️ Çalışma Kâğıdı</a>') + '</div>';
   }
   function viewLesson(w) {
     var t = temaOf(w.tema), GW = WEEKS.filter(function (x) { return gr(x) === gr(w); }), i = GW.indexOf(w);
@@ -65,8 +66,8 @@
       html += '<div class="sec reveal"><h3><span class="snum">?</span><span class="sico">🤔</span>Biliyor muydun?</h3><div class="box tip">' + ex.m + '</div></div>';
     }
     html += '<div class="sec reveal"><h3><span class="snum">🧠</span><span class="sico">🎯</span>Kendimi Yokla</h3><p class="note">4 hızlı soru: bir şıkka tıkla, doğru cevap ve çözüm hemen görünsün.</p><div class="miniq" id="miniq"></div></div>';
-    html += '</div><div class="donebox no-print"><button class="btn" id="anl">' + (load('done:' + w.no, false) ? '🎉 Tamamlandı!' : '✅ Konuyu anladım!') + '</button><span class="note">Bitirince tıkla, konfeti patlasın!</span></div><p><a class="btn" href="#/hafta/' + w.no + '/testler">Testlere geç →</a> <a class="btn alt" href="#/hafta/' + w.no + '/oyun">🎮 Oyun</a> <a class="btn alt" href="#/hafta/' + w.no + '/sinav">Sınav kâğıdı</a></p>';
-    html += '<p class="note no-print">' + (i > 0 ? '<a href="#/hafta/' + GW[i - 1].no + '">← Hafta ' + wn(GW[i - 1]) + ': ' + esc(GW[i - 1].title) + '</a>' : '') + (i < GW.length - 1 ? ' &nbsp;|&nbsp; <a href="#/hafta/' + GW[i + 1].no + '">Hafta ' + wn(GW[i + 1]) + ': ' + esc(GW[i + 1].title) + ' →</a>' : '') + '</p></div>';
+    html += '</div>' + (DB.user ? '' : '<div class="donebox no-print"><button class="btn" id="anl">' + (load('done:' + w.no, false) ? '🎉 Tamamlandı!' : '✅ Konuyu anladım!') + '</button><span class="note">Bitirince tıkla, konfeti patlasın!</span></div>') + '<p><a class="btn" href="#/hafta/' + w.no + '/testler">Testlere geç →</a>' + (DB.user ? '' : ' <a class="btn alt" href="#/hafta/' + w.no + '/oyun">🎮 Oyun</a> <a class="btn alt" href="#/hafta/' + w.no + '/sinav">Sınav kâğıdı</a>') + '</p>';
+    html += (DB.user ? '' : '<p class="note no-print">' + (i > 0 ? '<a href="#/hafta/' + GW[i - 1].no + '">← Hafta ' + wn(GW[i - 1]) + ': ' + esc(GW[i - 1].title) + '</a>' : '') + (i < GW.length - 1 ? ' &nbsp;|&nbsp; <a href="#/hafta/' + GW[i + 1].no + '">Hafta ' + wn(GW[i + 1]) + ': ' + esc(GW[i + 1].title) + ' →</a>' : '') + '</p>') + '</div>';
     return { html: html, after: function () { lessonFx(w); } };
   }
   function secIcon(h) {
@@ -123,7 +124,7 @@
     var t = temaOf(w.tema), qs = QZ.buildTest(w, k);
     var html = crumbs(w, 'Test ' + k) + '<div class="wk-head" ' + cssVar(t.color) + '><span class="pill">Hafta ' + wn(w) + ' • Test ' + k + '/' + QZ.TEST_COUNT + '</span><h1>' + esc(w.title) + '</h1></div><div class="card" ' + cssVar(t.color) + ' id="quiz">';
     qs.forEach(function (q, i) { html += qHtml(q, i); });
-    html += '</div><div class="scorebar"><div id="sc" class="score">Cevapla: 0/' + qs.length + '</div><div><button class="btn" id="finish">Bitir ve Kontrol Et</button> <button class="btn alt hidden" id="retry">Tekrar dene</button> ' + (k < QZ.TEST_COUNT ? '<a class="btn alt hidden" id="nxt" href="#/hafta/' + w.no + '/test/' + (k + 1) + '">Sonraki test →</a>' : '<a class="btn alt hidden" id="nxt" href="#/hafta/' + w.no + '/sinav">Sınav kâğıdına geç →</a>') + '</div></div>';
+    html += '</div><div class="scorebar"><div id="sc" class="score">Cevapla: 0/' + qs.length + '</div><div><button class="btn" id="finish">Bitir ve Kontrol Et</button> <button class="btn alt hidden" id="retry">Tekrar dene</button> ' + (k < QZ.TEST_COUNT ? '<a class="btn alt hidden" id="nxt" href="#/hafta/' + w.no + '/test/' + (k + 1) + '">Sonraki test →</a>' : DB.user ? '<a class="btn alt hidden" id="nxt" href="#/ogrenci">Haftalık ilerlememe dön →</a>' : '<a class="btn alt hidden" id="nxt" href="#/hafta/' + w.no + '/sinav">Sınav kâğıdına geç →</a>') + '</div></div>';
     return { html: html, after: function () { wireQuiz(w, k, qs, { kind: 'test', ref: w.no + ':' + k, src: function (i) { return 't|' + w.no + '|' + k + '|' + i; } }); } };
   }
   function wireQuiz(w, k, qs, meta) {
@@ -397,8 +398,36 @@
   }
 
   // ---------------- Yönlendirme ----------------
-  function route() {
+  function studentCanOpen(p, data) {
+    if (p[0] === 'ogrenci' || p[0] === 'rapor') return true;
+    if (p[0] !== 'hafta') return false;
+    var no = String(+p[1]), weekAccess = (data.assignments || []).filter(function (a) { return a.kind === 'week' && a.ref === no; })[0];
+    if (weekAccess && !weekAccess.done) {
+      return !p[2] || p[2] === 'testler' || (p[2] === 'test' && +p[3] >= 1 && +p[3] <= QZ.TEST_COUNT);
+    }
+    var legacy = (data.assignments || []).some(function (a) { return !a.done && a.kind === 'test' && a.ref.indexOf(no + ':') === 0; });
+    return legacy && p[2] === 'test' && (data.assignments || []).some(function (a) { return !a.done && a.kind === 'test' && a.ref === no + ':' + p[3]; });
+  }
+  function route(guarded) {
     var h = location.hash.replace(/^#\/?/, ''), p = h.split('/'), out;
+    if (window.DB && DB.user) {
+      document.body.classList.add('student-mode');
+      if (!guarded) {
+        var requestedHash = location.hash;
+        DB.data().then(function (data) {
+          if (location.hash !== requestedHash) return;
+          if (!studentCanOpen(p, data)) {
+            app.innerHTML = '<section class="access-lock"><div class="access-lock-icon" aria-hidden="true">🔒</div><h1>Bu içerik henüz açık değil</h1><p>Öğretmenin yalnızca erişim verdiği haftanın konu anlatımını ve testlerini görebilirsin. Yeni bir hafta açıldığında burada görünür.</p><a class="btn" href="#/ogrenci">Panelime dön</a></section>';
+            document.title = 'Matematik • Erişim bekleniyor';
+            return;
+          }
+          route(true);
+        }).catch(function () {
+          if (location.hash === requestedHash) app.innerHTML = '<p class="access-error">İçerik erişimi doğrulanamadı. İnternet bağlantını kontrol edip tekrar dene. <button class="btn sm" onclick="location.reload()">Tekrar dene</button></p>';
+        });
+        return;
+      }
+    } else document.body.classList.remove('student-mode');
     if (p[0] === '') out = { html: viewHome(6) };
     else if (p[0] === 'sinif7') out = { html: viewHome(7) };
     else if (p[0] === 'hakkinda') out = { html: viewAbout() };
