@@ -1,14 +1,8 @@
 :root {
-  --bg: #f6f7fb; --card: #ffffff; --ink: #1f2430; --muted: #667085; --line: #e3e6ee;
+  --bg: #ffffff; --card: #ffffff; --ink: #1f2430; --muted: #667085; --line: #e3e6ee;
   --brand: #4c4fef; --ok: #14a44d; --bad: #d63031; --warn: #f59f00;
   --shape: #dfe7ff; --stroke: #3b4cca;
   --r: 14px; --shadow: 0 1px 2px rgba(16,24,40,.06), 0 4px 14px rgba(16,24,40,.06);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #12141b; --card: #1b1f2a; --ink: #eceff6; --muted: #9aa3b5; --line: #2b3040;
-    --brand: #8b8dff; --shape: #26325f; --stroke: #9aa8ff; --shadow: 0 1px 2px rgba(0,0,0,.4);
-  }
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -276,7 +270,6 @@ svg.vis { max-width: 560px; width: 100%; height: auto; display: block; margin: 8
 svg.vis text { fill: #1f2430; font-family: inherit; } svg.vis .tw { fill: #fff; }
 svg.vis .ln { stroke: #3b4cca; stroke-width: 2; fill: none; } svg.vis .grid { stroke: #dfe3ef; stroke-width: 1; } svg.vis .trans { stroke: #e84393; stroke-width: 2.5; }
 svg.vis .rt { fill: none; stroke: #667085; stroke-width: 1.5; } svg.vis .pt { fill: #1f2430; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) svg.vis text { fill: #eceff6; } :root:not([data-theme="light"]) svg.vis .tw { fill: #fff; } :root:not([data-theme="light"]) svg.vis .grid { stroke: #343a4f; } }
 .vrow { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: center; }
 .vrow > div { text-align: center; }
 .vcap { text-align: center; color: var(--muted); font-size: 14px; margin: 4px 0 8px; }
@@ -368,7 +361,6 @@ body.pad-open { overflow: hidden; }
 /* ===== Öğrenci / öğretmen / rapor ===== */
 .topnav { display: flex; align-items: center; flex-wrap: wrap; } .topnav #navx { display: contents; }
 .banner { background: linear-gradient(90deg, #e8f0ff, #f3e8ff); border: 1.5px solid #c7d2fe; border-radius: 14px; padding: 10px 16px; margin-bottom: 12px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; color: #1f2430; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .banner { background: #1e2340; border-color: #3b4380; color: #eceff6; } }
 .sec-pad { padding: 14px 4px; }
 .login { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 8px 0; }
 .login input, .login select, .asgform select, .asgform input { padding: 9px 12px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); font: inherit; }
