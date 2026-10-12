@@ -511,7 +511,7 @@ body.pad-open { overflow: hidden; }
 .lp-steps li::before { content: counter(s); display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--bl); color: #fff; font-weight: 900; margin-bottom: 6px; }
 .lp-steps b { font-size: 18px; color: var(--nv); }
 .lp-steps span { color: #3a4f78; font-weight: 600; max-width: 34ch; }
-@media (max-width: 760px) { .lp-actions, .lp-steps { grid-template-columns: 1fr; } .lp-hero { padding: 28px 18px 18px; border-radius: 22px; } .lp-form input { font-size: 22px; } }
+@media (max-width: 760px) { .nl-n { font-size: 22px; } .nl-dot-t { font-size: 20px; } .lp-actions, .lp-steps { grid-template-columns: 1fr; } .lp-hero { padding: 28px 18px 18px; border-radius: 22px; } .lp-form input { font-size: 22px; } }
 @media (prefers-reduced-motion: reduce) { .nl-mark { animation: none; } .lp-btn { transition: none; } }
 
 /* Test ekranları: beyaz arka plan */
