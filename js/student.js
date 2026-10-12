@@ -127,14 +127,12 @@
     for (k = -5; k <= 5; k++) { var x = 30 + (k + 5) * 54; ticks += '<line x1="' + x + '" y1="40" x2="' + x + '" y2="' + (k === 0 ? 58 : 52) + '" stroke="currentColor" stroke-width="' + (k === 0 ? 3 : 2) + '" stroke-linecap="round"/><text x="' + x + '" y="76" text-anchor="middle" class="nl-n">' + (k < 0 ? '−' + (-k) : k) + '</text>'; }
     var line = '<svg class="numline" viewBox="0 0 600 90" role="img" aria-label="−5 ile 5 arasında sayı doğrusu; işaretçi 2 sayısında duruyor"><line x1="12" y1="40" x2="588" y2="40" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>' + ticks + '<g class="nl-mark"><circle cx="408" cy="40" r="13" class="nl-dot"/><text x="408" y="45" text-anchor="middle" class="nl-dot-t">2</text></g></svg>';
     var iconKid = '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M6 10.5V16c0 1.2 2.7 3 6 3s6-1.8 6-3v-5.5"/></svg>';
-    var iconTeach = '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>';
     return { html: '<section class="landing">' +
       '<div class="lp-hero"><h1>Matematik</h1><p class="lp-sub">Haftalık konu anlatımı ve testler.</p>' + line + '</div>' +
       '<div class="lp-actions">' +
         '<div class="lp-card lp-student"><div class="lp-ico">' + iconKid + '</div><h2>Öğrenci girişi</h2><p>Öğretmeninden erişim kodu aldıysan giriş yap.</p>' +
           '<form id="lform" class="lp-form" autocomplete="off"><label for="lcode">Erişim kodu</label><input id="lcode" maxlength="8" placeholder="Örn. K7M2QP" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="lerr"><button class="lp-btn" id="lgo2" type="submit">Giriş yap</button></form>' +
           '<p id="lerr" class="lp-err" role="alert"></p></div>' +
-        '<div class="lp-card lp-teacher"><div class="lp-ico">' + iconTeach + '</div><h2>Öğretmen girişi</h2><p>Öğrenci ekle, hafta erişimi ver ve sonuçları incele.</p><a class="lp-btn alt" href="#/ogretmen">Öğretmen girişi</a></div>' +
       '</div>' +
       '<ol class="lp-steps"><li><b>Öğretmenin haftayı açar</b><span>Yalnızca açılan haftanın konu anlatımı ve testleri görünür.</span></li><li><b>Konuyu oku, testleri çöz</b><span>Her konuda 10 test var. Sonuçların kaydedilir; tekrar çözersen son sonuç geçerli olur.</span></li><li><b>Çalışmanı gönder</b><span>10 testi bitirince çalışmanı öğretmenine gönderirsin.</span></li></ol>' +
       '</section>', after: function () {

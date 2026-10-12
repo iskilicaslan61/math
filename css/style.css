@@ -486,7 +486,7 @@ body.pad-open { overflow: hidden; }
 .nl-dot-t { font: 900 14px 'Nunito', system-ui, sans-serif; fill: #0b2a5b; }
 .nl-mark { animation: nlHop 1.3s cubic-bezier(.2, .8, .2, 1) .2s both; }
 @keyframes nlHop { from { transform: translateX(-380px); } 70% { transform: translateX(8px); } to { transform: translateX(0); } }
-.lp-actions { display: grid; grid-template-columns: 1.35fr 1fr; gap: 16px; margin-top: 18px; }
+.lp-actions { display: grid; grid-template-columns: minmax(0, 560px); gap: 16px; margin-top: 18px; }
 .lp-card { background: var(--sky); border: 2px solid #c9dcfb; border-radius: 22px; padding: 24px 22px; }
 .lp-card h2 { font-size: 24px; font-weight: 800; margin: 10px 0 4px; color: var(--nv); }
 .lp-card p { margin: 0 0 16px; color: #26406b; font-weight: 600; max-width: 42ch; }
