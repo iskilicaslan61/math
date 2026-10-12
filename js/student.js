@@ -103,13 +103,16 @@
     var h = '';
     document.body.classList.toggle('student-mode', !!DB.user);
     var brand = document.querySelector('.brand'); if (brand) brand.href = DB.user ? '#/ogrenci' : '#/';
+    var teacherIn = !!DB.tTok();
     if (DB.user) h += '<a href="#/ogrenci">👤 ' + esc(DB.user.name) + '</a><a href="#/rapor">Raporum</a><a href="#" id="lgo">Çıkış</a>';
-    else h += '<a href="#/rapor">Raporum</a><a href="#/hata">Hata Defterim</a>' + (DB.server ? '<a href="#/giris">Öğrenci Girişi</a><a href="#/ogretmen">Öğretmen</a>' : '');
+    else if (DB.server && teacherIn) h += '<a href="#/sinif6">6. Sınıf</a><a href="#/sinif7">7. Sınıf</a><a href="#/ogretmen">🧑‍🏫 Panel</a>';
+    else if (DB.server) h += '<a href="#/giris">Öğrenci Girişi</a><a href="#/ogretmen">Öğretmen Girişi</a>';
+    else h += '<a href="#/sinif6">6. Sınıf</a><a href="#/sinif7">7. Sınıf</a><a href="#/rapor">Raporum</a><a href="#/hata">Hata Defterim</a>';
     n.innerHTML = h;
     var l = $('lgo'); if (l) l.onclick = function (e) { e.preventDefault(); DB.logout(); nav(); go('#/'); };
   }
   X.after = function (p) {
-    var lg = null; if (p[0] === 'sinif7') lg = 7; else if (p[0] === '') lg = 6; else if (p[0] === 'hafta') { lg = gW(p[1]); } else if (p[0] === 'tema') { lg = gT(p[1]); } if (lg) X.save('lastGrade', lg);
+    var lg = null; if (p[0] === 'sinif7') lg = 7; else if (p[0] === 'sinif6') lg = 6; else if (p[0] === 'hafta') { lg = gW(p[1]); } else if (p[0] === 'tema') { lg = gT(p[1]); } if (lg) X.save('lastGrade', lg);
     DB.ready.then(function () {
       nav();
       var b = $('homebanner'); if (!b) return;
@@ -119,6 +122,13 @@
   };
   DB.ready.then(nav);
 
+  // ---------- açılış sayfası ----------
+  X.routes.landing = function () {
+    return { html: '<section class="landing"><h1>Matematik 6 ve 7. Sınıf</h1><p class="lead">Haftalık konu anlatımı ve testler.</p><div class="landing-cards"><div class="landing-card"><div class="landing-ico" aria-hidden="true">🎒</div><h2>Öğrenci Girişi</h2><p>Öğretmeninden erişim kodu aldıysan giriş yap.</p><div class="login"><input id="lcode" maxlength="8" placeholder="Erişim kodu" autocomplete="off" autocapitalize="characters" aria-label="Erişim kodu"><button class="btn" id="lgo2">Öğrenci girişi yap</button></div><p id="lerr" class="note" style="color:var(--bad)"></p></div><div class="landing-card"><div class="landing-ico" aria-hidden="true">🧑‍🏫</div><h2>Öğretmen Girişi</h2><p>Öğrenci ekle, hafta erişimi ver, sonuçları incele.</p><a class="btn" href="#/ogretmen">Öğretmen girişi</a></div></div></section>', after: function () {
+      var inp = $('lcode'); function submit() { $('lerr').textContent = ''; DB.login(inp.value).then(function () { nav(); go('#/ogrenci'); }).catch(function (e) { $('lerr').textContent = e.message; }); }
+      $('lgo2').onclick = submit; inp.onkeydown = function (e) { if (e.key === 'Enter') submit(); };
+    } };
+  };
   // ---------- giriş ----------
   X.routes.giris = function () {
     return { html: '<h1>🔑 Öğrenci Girişi</h1><div class="card"><div class="sec-pad">' + (DB.server ? '<p>Öğretmeninin verdiği <b>erişim kodunu</b> yaz.</p><div class="login"><input id="code" maxlength="8" placeholder="KOD" autocomplete="off" autocapitalize="characters"><button class="btn" id="go">Giriş yap</button></div><p id="err" class="note" style="color:var(--bad)"></p>' : '<p>Bu sitede öğrenci girişi kapalı (sunucu bağlı değil). Sonuçların <b>bu cihazda</b> saklanır; raporunu yine görebilirsin.</p><p><a class="btn" href="#/rapor">Raporum</a></p>') + '</div></div>', after: function () {
@@ -217,7 +227,7 @@
     if (!DB.server) { root.innerHTML = '<p>Öğretmen paneli için sunucu gerekir. Sunucuyu <code>node server.js</code> ile çalıştırın (ayrıntı: README).</p>'; return; }
     if (!DB.tTok()) {
       root.innerHTML = '<div class="card"><div class="sec-pad"><p>Öğretmen şifresini girin.</p><div class="login"><input id="tpw" type="password" placeholder="Şifre"><button class="btn" id="tgo">Giriş</button></div><p id="terr" class="note" style="color:var(--bad)"></p></div></div>';
-      function go2() { DB.tLogin($('tpw').value).then(renderTeacher).catch(function (e) { $('terr').textContent = e.message; }); }
+      function go2() { DB.tLogin($('tpw').value).then(function () { nav(); renderTeacher(); }).catch(function (e) { $('terr').textContent = e.message; }); }
       $('tgo').onclick = go2; $('tpw').onkeydown = function (e) { if (e.key === 'Enter') go2(); }; return;
     }
     DB.t('GET', '/students').then(function (d) { drawTeacher(root, d.students); }).catch(function (e) { root.innerHTML = '<p style="color:var(--bad)">' + esc(e.message) + '</p><button class="btn" onclick="location.reload()">Yeniden dene</button>'; });
@@ -225,13 +235,13 @@
   function weekOptions() { return WEEKS.map(function (w) { return '<option value="' + w.no + '">' + esc(X.gr(w) + '. sınıf • Hafta ' + X.wn(w) + ' • ' + w.title) + '</option>'; }).join(''); }
   function temaOptions() { return TEMAS.map(function (t) { return '<option value="' + t.id + '">' + esc(X.gr(t) + '. sınıf • ' + X.tn(t) + '. ' + t.title) + '</option>'; }).join(''); }
   function drawTeacher(root, students) {
-    var h = '<p><button class="btn sm alt" id="tout">Çıkış</button> <button class="btn sm alt" id="tcards">🖨️ Erişim kartlarını yazdır</button></p>';
+    var h = '<p><a class="btn sm" href="#/sinif6">📚 6. Sınıf içerikleri</a> <a class="btn sm" href="#/sinif7">📚 7. Sınıf içerikleri</a> <button class="btn sm alt" id="tout">Çıkış</button> <button class="btn sm alt" id="tcards">🖨️ Erişim kartlarını yazdır</button></p>';
     h += '<div class="card"><div class="sec-pad"><h3>➕ Öğrenci ekle</h3><div class="login"><input id="sn" maxlength="40" placeholder="Ad (soyad ilk harfi yeterli)"><select id="sg"><option value="6">6. sınıf</option><option value="7">7. sınıf</option></select><button class="btn" id="sadd">Ekle</button></div><p id="snew" class="note"></p></div></div>';
     h += '<div class="card"><div class="sec-pad"><h3>👥 Öğrenciler (' + students.length + ')</h3>' + (students.length ? '<div class="tblwrap"><table class="tbl"><thead><tr><th><input type="checkbox" id="selall"></th><th>Ad</th><th>Sınıf</th><th>Erişim kodu</th><th>Son giriş</th><th>Çözülen</th><th>Ortalama</th><th>Açık hata</th><th></th></tr></thead><tbody>' + students.map(function (s) { return '<tr><td><input type="checkbox" class="sel" value="' + s.id + '"></td><td>' + esc(s.name) + '</td><td>' + s.grade + '</td><td><code class="codebox">' + esc(s.code) + '</code></td><td>' + dt(s.last) + '</td><td>' + s.results + '</td><td>' + (s.results ? '%' + s.avg : '—') + '</td><td>' + s.mistakes + '</td><td><a class="btn sm" href="#/ogretmen/ogrenci/' + s.id + '">Rapor</a> <button class="btn sm alt" data-nc="' + s.id + '">Yeni kod</button> <button class="btn sm alt" data-del="' + s.id + '">Sil</button></td></tr>'; }).join('') + '</tbody></table></div>' : '<p class="note">Henüz öğrenci yok. Yukarıdan ekleyin; her öğrenciye otomatik bir erişim kodu verilir.</p>') + '</div></div>';
     h += '<div class="card weekly-access-admin"><div class="sec-pad"><div class="access-admin-heading"><div><h3>Haftalık erişim</h3><p class="note">Bir hafta açın. Öğrenci yalnızca o haftanın konu anlatımını ve 10 testini görür; tamamlayınca çalışmasını size gönderir.</p></div><span class="access-admin-icon" aria-hidden="true">↗</span></div><div class="asgform"><label>Açılacak hafta <select id="waweek">' + weekOptions() + '</select></label><label>Son teslim tarihi <input type="date" id="wadue"></label></div><p class="access-admin-actions"><button class="btn" id="wasel">Seçili öğrencilere hafta aç</button> <button class="btn alt" id="wa6">Tüm 6. sınıfa aç</button> <button class="btn alt" id="wa7">Tüm 7. sınıfa aç</button></p><p id="wamess" class="note" aria-live="polite"></p></div></div>';
     h += '<details class="legacy-assign"><summary>Tekil test veya başka ödev ata</summary><div class="card"><div class="sec-pad"><h3>📤 Ödev ata</h3><p class="note">Tablodan öğrencileri işaretleyin (ya da sınıfa toplu atayın).</p><div class="asgform"><label>Tür <select id="ak"><option value="test">Hafta testi</option><option value="pekistirme">Pekiştirme testi</option><option value="sinav">Hafta sınavı</option><option value="tsinav">Ünite sınavı</option><option value="hata">Hata defteri çözümü</option></select></label><label id="aw1">Konu <select id="aw">' + weekOptions() + '</select></label><label id="at1" class="hidden">Ünite <select id="at">' + temaOptions() + '</select></label><label id="an1">Test no <select id="an"></select></label><label>Son gün <input type="date" id="ad"></label></div><p><button class="btn" id="asel">Seçili öğrencilere ata</button> <button class="btn alt" id="a6">Tüm 6. sınıflara</button> <button class="btn alt" id="a7">Tüm 7. sınıflara</button></p><p id="amsg" class="note"></p></div></div></details>';
     root.innerHTML = h;
-    $('tout').onclick = function () { DB.tLogout(); renderTeacher(); };
+    $('tout').onclick = function () { DB.tLogout(); nav(); go('#/'); };
     $('sadd').onclick = function () { var nm = $('sn').value.trim(); if (!nm) return; DB.t('POST', '/students', { name: nm, grade: +$('sg').value }).then(function (r) { renderTeacher(); setTimeout(function () { var m = $('snew'); if (m) m.innerHTML = '✅ <b>' + esc(r.name) + '</b> eklendi. Erişim kodu: <code class="codebox">' + esc(r.code) + '</code>'; }, 300); }).catch(function (e) { $('snew').textContent = e.message; }); };
     var sa = $('selall'); if (sa) sa.onchange = function () { [].forEach.call(document.querySelectorAll('.sel'), function (c) { c.checked = sa.checked; }); };
     root.onclick = function (e) {

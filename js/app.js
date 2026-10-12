@@ -12,7 +12,7 @@
   function gr(x) { return x.grade || 6; }
   function wn(w) { return w.wk || w.no; }
   function tn(t) { return t.n || t.id; }
-  function homeHref(x) { return gr(x) === 7 ? '#/sinif7' : '#/'; }
+  function homeHref(x) { return gr(x) === 7 ? '#/sinif7' : '#/sinif6'; }
   function temaOf(id) { return TEMAS.filter(function (t) { return t.id === id; })[0]; }
   function weekOf(no) { return WEEKS.filter(function (w) { return w.no === no; })[0]; }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -24,7 +24,7 @@
   function viewHome(g) {
     var TM = TEMAS.filter(function (t) { return gr(t) === g; }), WK = WEEKS.filter(function (w) { return gr(w) === g; });
     var totalHours = 0; TM.forEach(function (t) { totalHours += t.hours; });
-    var html = '<div id="homebanner"></div><div class="gtabs"><a class="gt' + (g === 6 ? ' on' : '') + '" href="#/">6. Sınıf</a><a class="gt' + (g === 7 ? ' on' : '') + '" href="#/sinif7">7. Sınıf</a></div><section class="hero"><h1>' + g + '. Sınıf Matematik</h1><p>' + g + '. sınıf matematik müfredatına göre hafta hafta işleyeceğiniz dersin <b>konu anlatımı</b>, her konu için <b>10 test</b> ve <b>sınav kâğıdı</b>. Birimden birime (temadan temaya) ilerleyin.</p>' +
+    var html = '<div id="homebanner"></div><div class="gtabs"><a class="gt' + (g === 6 ? ' on' : '') + '" href="#/sinif6">6. Sınıf</a><a class="gt' + (g === 7 ? ' on' : '') + '" href="#/sinif7">7. Sınıf</a></div><section class="hero"><h1>' + g + '. Sınıf Matematik</h1><p>' + g + '. sınıf matematik müfredatına göre hafta hafta işleyeceğiniz dersin <b>konu anlatımı</b>, her konu için <b>10 test</b> ve <b>sınav kâğıdı</b>. Birimden birime (temadan temaya) ilerleyin.</p>' +
       '<div class="stats"><div class="stat"><b>' + TM.length + '</b><span>Ünite (Tema)</span></div><div class="stat"><b>' + WK.length + '</b><span>Haftalık konu</span></div><div class="stat"><b>' + WK.length * QZ.TEST_COUNT + '</b><span>Test</span></div><div class="stat"><b>' + (WK.length + TM.length) + '</b><span>Sınav kâğıdı</span></div><div class="stat"><b>' + totalHours + '</b><span>Ders saati</span></div></div></section>';
     html += '<p class="note">Haftalık plan, her hafta yaklaşık 5 ders saati varsayımıyla hazırlanmıştır; kendi yıllık planınıza göre kaydırabilirsiniz. Test soruları sayısal değerleriyle her test için farklı üretilir, aynı test her açılışta aynı sorularla gelir.</p>';
     TM.forEach(function (t) {
@@ -157,7 +157,7 @@
       });
       document.getElementById('sc').innerHTML = 'Sonuç: <span style="color:var(--ok)">' + score + '</span>/' + qs.length + ' doğru';
       var prev = bestOf(w.no, k); if (prev === null || score > prev) save('best:' + w.no + ':' + k, score);
-      if (meta && window.DB) { DB.record({ kind: meta.kind, ref: meta.ref, score: score, total: qs.length, dur: Math.round((Date.now() - t0) / 1000), w: ws, c: cs, wrong: wrongKeys, right: rightKeys }).then(function (ok) { var s = document.getElementById('sc'); if (s) s.innerHTML += ' <small class="note">' + (DB.user ? (ok ? '✓ sonucun kaydedildi' : '⚠️ kaydedilemedi') : '✓ bu cihaza kaydedildi') + '</small>'; }); }
+      if (meta && window.DB) { DB.record({ kind: meta.kind, ref: meta.ref, score: score, total: qs.length, dur: Math.round((Date.now() - t0) / 1000), w: ws, c: cs, wrong: wrongKeys, right: rightKeys }).then(function (ok) { var s = document.getElementById('sc'); if (s) s.innerHTML += ' <small class="note">' + (DB.user ? (ok ? '✓ sonucun kaydedildi' : '⚠️ kaydedilemedi' + (DB.lastError ? ' (' + DB.lastError + ')' : '')) : '✓ bu cihaza kaydedildi') + '</small>'; }); }
       if (meta && meta.onFinish) meta.onFinish(score);
       document.getElementById('finish').classList.add('hidden');
       document.getElementById('retry').classList.remove('hidden'); document.getElementById('nxt').classList.remove('hidden');
@@ -267,7 +267,7 @@
       res.innerHTML = '<div class="rs-big">' + MC.num(score) + ' <small>/ 100</small></div><div><b>' + esc(name) + '</b><br>✅ ' + ok + ' doğru • ❌ ' + bad + ' yanlış • ⚪ ' + (n - ok - bad) + ' boş • ⏱ ' + fmt(Math.floor((Date.now() - t0) / 1000)) + '<br>' + (score >= 85 ? '🌟 Pekiyi!' : score >= 70 ? '👏 İyi' : score >= 50 ? '💪 Orta, tekrar çalış' : '📖 Konuyu tekrar et') + '</div>';
       res.classList.remove('hidden'); key.classList.remove('hidden'); tk.textContent = 'Cevap anahtarını gizle';
       var prev = load('exam:' + id, null); if (prev === null || score > prev) save('exam:' + id, score);
-      if (meta && window.DB) { DB.record({ kind: meta.kind, ref: meta.ref, score: ok, total: n, dur: Math.round((Date.now() - t0) / 1000), w: ws, c: cs, wrong: wrongKeys, right: rightKeys }).then(function (sv) { res.innerHTML += '<div class="note">' + (DB.user ? (sv ? '✓ sonucun kaydedildi' : '⚠️ kaydedilemedi') : '✓ bu cihaza kaydedildi') + '</div>'; }); }
+      if (meta && window.DB) { DB.record({ kind: meta.kind, ref: meta.ref, score: ok, total: n, dur: Math.round((Date.now() - t0) / 1000), w: ws, c: cs, wrong: wrongKeys, right: rightKeys }).then(function (sv) { res.innerHTML += '<div class="note">' + (DB.user ? (sv ? '✓ sonucun kaydedildi' : '⚠️ kaydedilemedi' + (DB.lastError ? ' (' + DB.lastError + ')' : '')) : '✓ bu cihaza kaydedildi') + '</div>'; }); }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
     var best = load('exam:' + id, null);
@@ -428,7 +428,12 @@
         return;
       }
     } else document.body.classList.remove('student-mode');
-    if (p[0] === '') out = { html: viewHome(6) };
+    if (!window.DB || !DB.loaded) { app.innerHTML = ''; return; }
+    var teacherIn = !!(DB.tTok && DB.tTok());
+    if (DB.server && !DB.user && !teacherIn && ['sinif6', 'sinif7', 'hafta', 'tema', 'hakkinda'].indexOf(p[0]) >= 0) p = [''];
+    if (DB.server && DB.user && p[0] === '') { location.hash = '#/ogrenci'; return; }
+    if (p[0] === '') out = (DB.server && window.APPX && APPX.routes.landing) ? APPX.routes.landing(p) : { html: viewHome(6) };
+    else if (p[0] === 'sinif6') out = { html: viewHome(6) };
     else if (p[0] === 'sinif7') out = { html: viewHome(7) };
     else if (p[0] === 'hakkinda') out = { html: viewAbout() };
     else if (p[0] === 'tema' && p[2] === 'sinav' && temaOf(+p[1])) out = viewTemaExam(+p[1]);

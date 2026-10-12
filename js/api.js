@@ -15,7 +15,7 @@
     D.ready = req('GET', '/api/ping').then(function (r) { D.server = !!(r.ok && r.data && r.data.ok); }).catch(function () { D.server = false; }).then(function () {
       var tok = ls('tok', null); if (!D.server || !tok) return;
       return req('GET', '/api/me', null, tok).then(function (r) { if (r.ok) { D.user = r.data.student; D.cache = r.data; } else lset('tok', null); }).catch(function () { });
-    });
+    }).then(function () { D.loaded = true; });
     return D.ready;
   };
   D.login = function (code) { return req('POST', '/api/login', { code: code }).then(function (r) { if (!r.ok) throw new Error(r.data.error || 'Giriş başarısız'); lset('tok', r.data.token); return req('GET', '/api/me', null, r.data.token).then(function (m) { D.user = m.data.student; D.cache = m.data; return D.user; }); }); };
@@ -27,7 +27,7 @@
   };
   // res: {kind, ref, score, total, dur, w, c, wrong:[keys], right:[keys]}
   D.record = function (res) {
-    if (D.user) return req('POST', '/api/result', res, ls('tok', null)).then(function (r) { return r.ok; }).catch(function () { return false; });
+    if (D.user) return req('POST', '/api/result', res, ls('tok', null)).then(function (r) { D.lastError = r.ok ? '' : (r.data && r.data.error) || ('Hata ' + r.status); return r.ok; }).catch(function () { return false; });
     var rs = ls('results', []); rs.unshift({ kind: res.kind, ref: res.ref, score: res.score, total: res.total, dur: res.dur, w: res.w, c: res.c, t: Date.now() }); lset('results', rs.slice(0, 300));
     var ms = ls('mistakes', {}); (res.wrong || []).forEach(function (k) { var m = ms[k] || { n: 0 }; m.n++; m.solved = false; m.t = Date.now(); ms[k] = m; });
     (res.right || []).forEach(function (k) { if (ms[k]) { ms[k].solved = true; ms[k].t = Date.now(); } }); lset('mistakes', ms);

@@ -192,7 +192,7 @@ async function api(req, res, url) {
       await q('DELETE FROM results WHERE student_id=? AND kind=? AND ref=?').run(s.id, kind, ref);
       await q('INSERT INTO results(student_id,kind,ref,score,total,dur,w,c,created) VALUES(?,?,?,?,?,?,?,?,?)').run(s.id, kind, ref, score, total, dur, w.join(','), c, now);
       const wrong = Array.isArray(body.wrong) ? body.wrong.slice(0, 100).filter(validKey) : [];
-      const up = q('INSERT INTO mistakes(student_id,key,n,solved,updated) VALUES(?,?,1,0,?) ON CONFLICT(student_id,key) DO UPDATE SET n=n+1, solved=0, updated=excluded.updated');
+      const up = q('INSERT INTO mistakes(student_id,key,n,solved,updated) VALUES(?,?,1,0,?) ON CONFLICT(student_id,key) DO UPDATE SET n=mistakes.n+1, solved=0, updated=excluded.updated');
       for (const k of wrong) await up.run(s.id, k, now);
       const ok = Array.isArray(body.right) ? body.right.slice(0, 100).filter(validKey) : [];
       const sv = q('UPDATE mistakes SET solved=1, updated=? WHERE student_id=? AND key=?'); for (const k of ok) await sv.run(now, s.id, k);
