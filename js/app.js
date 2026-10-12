@@ -450,6 +450,7 @@
     } else if (window.APPX && APPX.routes[p[0]]) out = APPX.routes[p[0]](p);
     else out = { html: '<h1>Sayfa bulunamadı</h1><p><a href="#/">Ana sayfaya dön</a></p>' };
     var pg = document.getElementById('prog'); if (pg) pg.remove(); window.onscroll = null;
+    app.classList.toggle('white-view', ['test', 'testler', 'pekistirme', 'sinav'].indexOf(p[2]) >= 0 || p[0] === 'hata');
     app.innerHTML = out.html;
     hydrate();
     if (out.after) out.after();

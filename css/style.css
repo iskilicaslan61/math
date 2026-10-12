@@ -482,3 +482,6 @@ body.pad-open { overflow: hidden; }
 .landing-card { background: #eaf2ff; border: 2px solid #bcd4fb; border-radius: 20px; padding: 26px 22px; box-shadow: var(--shadow); }
 .landing-ico { font-size: 44px; }
 .landing-card .login { justify-content: center; flex-wrap: wrap; }
+
+/* Test ekranları: beyaz arka plan */
+main.white-view { --card: #ffffff; }
