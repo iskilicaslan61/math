@@ -226,7 +226,7 @@ svg text.lbl { fill: var(--stroke); font-weight: 700; }
 @keyframes fall { to { transform: translateY(105vh) rotate(720deg); opacity: .9; } }
 @keyframes pop { 0% { transform: scale(.6); } 70% { transform: scale(1.12); } 100% { transform: scale(1); } }
 .lesson { display: grid; gap: 16px; margin-top: 14px; }
-.sec { background: var(--card); border: 1px solid var(--line); border-left: 8px solid var(--c); border-radius: 16px; padding: 4px 20px 16px; box-shadow: var(--shadow); }
+.sec { background: color-mix(in srgb, var(--c) 9%, #eaf2ff); border: 1px solid var(--line); border-left: 8px solid var(--c); border-radius: 16px; padding: 4px 20px 16px; box-shadow: var(--shadow); }
 .sec.reveal { opacity: 0; transform: translateY(26px); transition: opacity .55s ease, transform .55s ease; }
 .sec.reveal.in { opacity: 1; transform: none; }
 .sec h3 { display: flex; align-items: center; gap: 10px; border-bottom: 0; color: var(--ink); margin: 14px 0 6px; font-size: 20px; }
@@ -468,3 +468,9 @@ body.pad-open { overflow: hidden; }
   .submitted-week { align-items: flex-start; }
   .weekly-access-admin .asgform label { width: 100%; }
 }
+
+/* Konu anlatımı: renkli bölüm kartları ve Çöz butonu */
+.outcomes { background: #dbeafe; }
+.sec .box { background-color: #f4f8ff; }
+.solve-area { display: flex; align-items: center; gap: 14px; margin: 18px 0 6px; padding: 16px 18px; background: #fff; border: 2px solid #1d6fe0; border-radius: 16px; }
+.solve-btn { font-size: 22px; padding: 12px 36px; }

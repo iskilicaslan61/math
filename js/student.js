@@ -283,6 +283,13 @@
           var status = a.kind === 'week' ? (a.submitted ? '✓ Öğretmene gönderildi' : 'Açık · ' + (a.completedTests || 0) + '/10 test') : (a.done ? '✓ Tamamlandı' : 'Açık');
           return '<tr><td>' + esc(a.title) + '</td><td>' + esc(a.due || '—') + '</td><td>' + progress + '</td><td>' + status + (a.kind === 'week' ? ' <button type="button" class="btn sm alt" data-revoke-week="' + a.id + '">Erişimi kaldır</button>' : '') + '</td></tr>';
         }).join('') + '</tbody></table></div>' : '<p class="note">Henüz hafta erişimi veya ödev atanmamış.</p>');
+        var tr = fd.results.filter(function (r) { return r.kind === 'test'; });
+        html += '<h3>Çözülen testler: doğru / yanlış</h3>' + (tr.length ? '<div class="tblwrap"><table class="tbl"><thead><tr><th>Tarih</th><th>Hafta / test</th><th>Durum</th><th>Doğru</th><th>Yanlış</th><th>Boş</th></tr></thead><tbody>' + tr.map(function (r) {
+          var c = r.c || '', ok = (c.match(/1/g) || []).length, bad = (c.match(/0/g) || []).length, emp = (c.match(/-/g) || []).length;
+          if (!c) { ok = r.score; bad = r.total - r.score; emp = 0; }
+          var parts = String(r.ref).split(':');
+          return '<tr><td>' + dt(r.t) + '</td><td>' + esc(weekLabel(parts[0])) + ' • Test ' + esc(parts[1] || '') + '</td><td>✓ Çözüldü</td><td style="color:var(--ok)"><b>' + ok + '</b></td><td style="color:var(--bad)"><b>' + bad + '</b></td><td>' + emp + '</td></tr>';
+        }).join('') + '</tbody></table></div>' : '<p class="note">Henüz çözülen test yok.</p>');
         var open = fd.mistakes.filter(function (m) { return !m.solved; });
         html += '<h3>Açık hata defteri (' + open.length + ')</h3>' + (open.length ? '<ul>' + open.slice(0, 15).map(function (m) { var q = X.qFromKey(m.key); return q ? '<li>' + esc(weekLabel(q.week)) + ' — ' + esc(q.q.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 100)) + '… <b>(' + m.n + '×)</b></li>' : ''; }).join('') + '</ul>' : '<p class="note">Yok.</p>');
         $('rep').innerHTML = html;
