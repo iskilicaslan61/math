@@ -476,12 +476,43 @@ body.pad-open { overflow: hidden; }
 .solve-btn { font-size: 22px; padding: 12px 36px; }
 
 /* Açılış sayfası */
-.landing { text-align: center; padding: 28px 0; }
-.landing .lead { margin: 0 auto 22px; }
-.landing-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 760px; margin: 0 auto; }
-.landing-card { background: #eaf2ff; border: 2px solid #bcd4fb; border-radius: 20px; padding: 26px 22px; box-shadow: var(--shadow); }
-.landing-ico { font-size: 44px; }
-.landing-card .login { justify-content: center; flex-wrap: wrap; }
+.landing { --nv: #0b2a5b; --bl: #1d6fe0; --sky: #eaf2ff; --sun: #ffc83d; font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; padding: 8px 0 24px; }
+.lp-hero { position: relative; overflow: hidden; background: linear-gradient(135deg, #0b2a5b 0%, #1546a8 55%, #1d6fe0 100%); color: #fff; border-radius: 28px; padding: 40px 28px 24px; }
+.lp-hero h1 { font-size: clamp(44px, 9vw, 84px); font-weight: 900; line-height: 1; letter-spacing: -.02em; margin: 0 0 10px; }
+.lp-sub { font-size: clamp(18px, 2.6vw, 22px); font-weight: 600; margin: 0 0 22px; color: #dbe8ff; max-width: 40ch; }
+.numline { display: block; width: 100%; max-width: 640px; height: auto; color: #bcd4fb; margin-top: 8px; }
+.nl-n { font: 700 13px 'Nunito', system-ui, sans-serif; fill: #bcd4fb; }
+.nl-dot { fill: var(--sun); stroke: #0b2a5b; stroke-width: 3; }
+.nl-dot-t { font: 900 14px 'Nunito', system-ui, sans-serif; fill: #0b2a5b; }
+.nl-mark { animation: nlHop 1.3s cubic-bezier(.2, .8, .2, 1) .2s both; }
+@keyframes nlHop { from { transform: translateX(-380px); } 70% { transform: translateX(8px); } to { transform: translateX(0); } }
+.lp-actions { display: grid; grid-template-columns: 1.35fr 1fr; gap: 16px; margin-top: 18px; }
+.lp-card { background: var(--sky); border: 2px solid #c9dcfb; border-radius: 22px; padding: 24px 22px; }
+.lp-card h2 { font-size: 24px; font-weight: 800; margin: 10px 0 4px; color: var(--nv); }
+.lp-card p { margin: 0 0 16px; color: #26406b; font-weight: 600; max-width: 42ch; }
+.lp-ico { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 16px; background: var(--nv); color: #fff; }
+.lp-teacher { background: transparent; }
+.lp-teacher .lp-ico { background: #dbe8ff; color: var(--nv); }
+.lp-form { display: grid; gap: 8px; }
+.lp-form label { font-weight: 800; color: var(--nv); }
+.lp-form input { min-height: 56px; font: 800 26px 'Nunito', system-ui, sans-serif; letter-spacing: .22em; text-transform: uppercase; padding: 8px 16px; border: 2px solid #8fb4ee; border-radius: 14px; background: #fff; color: var(--nv); width: 100%; }
+.lp-form input::placeholder { letter-spacing: .04em; font-size: 18px; font-weight: 600; color: #6b83a8; text-transform: none; }
+.lp-form input:focus-visible { outline: 3px solid var(--bl); outline-offset: 2px; border-color: var(--bl); }
+.lp-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 10px 26px; border: 0; border-radius: 14px; font: 800 18px 'Nunito', system-ui, sans-serif; background: var(--sun); color: var(--nv); text-decoration: none; cursor: pointer; box-shadow: 0 4px 0 #d9a21a; transition: transform .15s, box-shadow .15s; }
+.lp-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 0 #d9a21a; }
+.lp-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #d9a21a; }
+.lp-btn:focus-visible { outline: 3px solid var(--nv); outline-offset: 3px; }
+.lp-btn:disabled { opacity: .6; cursor: progress; }
+.lp-btn.alt { background: transparent; color: var(--nv); border: 2px solid var(--nv); box-shadow: none; }
+.lp-btn.alt:hover { background: #dbe8ff; transform: none; box-shadow: none; }
+.lp-err { min-height: 1.4em; margin: 6px 0 0 !important; color: #b42318 !important; font-weight: 700 !important; }
+.lp-steps { list-style: none; counter-reset: s; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 0; margin: 26px 0 0; }
+.lp-steps li { counter-increment: s; display: grid; gap: 4px; align-content: start; padding: 4px 4px 0; }
+.lp-steps li::before { content: counter(s); display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--bl); color: #fff; font-weight: 900; margin-bottom: 6px; }
+.lp-steps b { font-size: 18px; color: var(--nv); }
+.lp-steps span { color: #3a4f78; font-weight: 600; max-width: 34ch; }
+@media (max-width: 760px) { .lp-actions, .lp-steps { grid-template-columns: 1fr; } .lp-hero { padding: 28px 18px 18px; border-radius: 22px; } .lp-form input { font-size: 22px; } }
+@media (prefers-reduced-motion: reduce) { .nl-mark { animation: none; } .lp-btn { transition: none; } }
 
 /* Test ekranları: beyaz arka plan */
 main.white-view { --card: #ffffff; }
