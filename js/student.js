@@ -117,7 +117,6 @@
       nav();
       var b = $('homebanner'); if (!b) return;
       if (DB.user) DB.data().then(function (d) { var pend = d.assignments.filter(function (a) { return !a.done; }); b.innerHTML = '<div class="banner"><b>👋 Merhaba ' + esc(DB.user.name) + '!</b> ' + (pend.length ? 'Yapman gereken <b>' + pend.length + '</b> ödevin var. ' : 'Bekleyen ödevin yok. ') + '<a class="btn sm" href="#/ogrenci">Panelime git</a></div>'; });
-      else if (DB.server) b.innerHTML = '<div class="banner">Öğretmeninden erişim kodu aldıysan <a class="btn sm" href="#/giris">Öğrenci girişi yap</a></div>';
     });
   };
   DB.ready.then(nav);
