@@ -491,7 +491,7 @@ body.pad-open { overflow: hidden; }
 .lp-card h2 { font-size: 24px; font-weight: 800; margin: 10px 0 4px; color: var(--nv); }
 .lp-card p { margin: 0 0 16px; color: #26406b; font-weight: 600; max-width: 42ch; }
 .lp-ico { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 16px; background: var(--nv); color: #fff; }
-.lp-teacher { background: transparent; }
+.lp-teacher { background: #f1f6ff; }
 .lp-teacher .lp-ico { background: #dbe8ff; color: var(--nv); }
 .lp-form { display: grid; gap: 8px; }
 .lp-form label { font-weight: 800; color: var(--nv); }
