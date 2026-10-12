@@ -188,6 +188,8 @@ async function api(req, res, url) {
       }
       const w = Array.isArray(body.w) ? body.w.slice(0, 100).map(x => int(x, 0, 999)).filter(x => x !== null) : [], c = typeof body.c === 'string' && /^[01-]{0,100}$/.test(body.c) ? body.c : '';
       const now = Date.now();
+      // Aynı test tekrar çözülünce önceki kayıt silinir; yalnızca son sonuç saklanır.
+      await q('DELETE FROM results WHERE student_id=? AND kind=? AND ref=?').run(s.id, kind, ref);
       await q('INSERT INTO results(student_id,kind,ref,score,total,dur,w,c,created) VALUES(?,?,?,?,?,?,?,?,?)').run(s.id, kind, ref, score, total, dur, w.join(','), c, now);
       const wrong = Array.isArray(body.wrong) ? body.wrong.slice(0, 100).filter(validKey) : [];
       const up = q('INSERT INTO mistakes(student_id,key,n,solved,updated) VALUES(?,?,1,0,?) ON CONFLICT(student_id,key) DO UPDATE SET n=n+1, solved=0, updated=excluded.updated');
