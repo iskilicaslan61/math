@@ -5,14 +5,14 @@
 const http = require('http'), fs = require('fs'), path = require('path'), crypto = require('crypto');
 
 const PORT = +process.env.PORT || 8080;
-const ROOT = __dirname;
+const ROOT = path.join(__dirname, '..');
 const DATA = process.env.DATA_DIR || path.join(ROOT, 'data');
 const USE_POSTGRES = !!process.env.DATABASE_URL;
 let db, SECRET;
 if (USE_POSTGRES) {
   const { Pool, types } = require('pg');
   types.setTypeParser(20, Number);
-  db = new Pool({ connectionString: process.env.DATABASE_URL });
+  db = new Pool({ connectionString: process.env.DATABASE_URL, max: process.env.VERCEL ? 1 : 10 });
   db.on('error', e => console.error('PostgreSQL bağlantı havuzu hatası:', e));
 } else {
   const { DatabaseSync } = require('node:sqlite');
@@ -284,14 +284,24 @@ const server = http.createServer((req, res) => {
   if (url.pathname.startsWith('/api/')) api(req, res, url).catch(e => { console.error(e); send(res, 500, { error: 'Sunucu hatası' }); });
   else serveStatic(req, res, url);
 });
-async function start() {
+async function init() {
   await initDatabase();
   await initSecret();
   await initTeacher();
-  server.listen(PORT, () => console.log('Matematik sitesi çalışıyor: http://localhost:' + PORT + '  (veri: ' + (USE_POSTGRES ? 'Supabase PostgreSQL' : DATA) + ')'));
 }
-start().catch(async e => {
-  console.error('Sunucu başlatılamadı:', e);
-  if (USE_POSTGRES) await db.end().catch(() => {});
-  process.exitCode = 1;
-});
+// Vercel (sunucusuz): her istekte bir kez başlatılır, sonra ön bellekten kullanılır.
+let ready;
+module.exports = async (req, res) => {
+  try { await (ready = ready || init()); } catch (e) { ready = null; console.error(e); return send(res, 500, { error: 'Sunucu hatası' }); }
+  const url = new URL(req.url, 'http://x');
+  return api(req, res, url).catch(e => { console.error(e); send(res, 500, { error: 'Sunucu hatası' }); });
+};
+if (require.main === module) {
+  init().then(() => {
+    server.listen(PORT, () => console.log('Matematik sitesi çalışıyor: http://localhost:' + PORT + '  (veri: ' + (USE_POSTGRES ? 'Supabase PostgreSQL' : DATA) + ')'));
+  }).catch(async e => {
+    console.error('Sunucu başlatılamadı:', e);
+    if (USE_POSTGRES) await db.end().catch(() => {});
+    process.exitCode = 1;
+  });
+}
